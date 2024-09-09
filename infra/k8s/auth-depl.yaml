@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - image: mistykraken/auth
+        name: auth
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "55M"
+        livenessProbe:
+          httpGet:
+            path: /_status/healthz
+            port: 3001
+          initialDelaySeconds: 90
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_status/healthz
+            port: 3001
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        ports:
+        - containerPort: 3001
+          name: auth-port
+        imagePullPolicy: Never
+        env:
+        - name: DB_MONGO_URL
+          value: mongodb://auth-mongo-srv:27017/auth
+        - name: NODE_PORT
+          value: "3001"
+        - name: NODE_ENV
+          value: "dev"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_KEY
+
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: auth-srv
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP

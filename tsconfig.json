@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "strict": true,
+    "moduleResolution": "NodeNext",
+    "module": "ES2015",
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "noUncheckedIndexedAccess": true,
+    "strictNullChecks": true /* When type checking, take into account 'null' and 'undefined'. */,
+    "noUnusedLocals": true /* Enable error reporting when local variables aren't read. */,
+    "noUnusedParameters": true /* Raise an error when a function parameter isn't read. */,
+    "skipDefaultLibCheck": true /* Skip type checking .d.ts files that are included with TypeScript. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "removeComments": true /* Disable emitting comments. */,
+    "allowJs": true,
+    "checkJs": true,
+
+    "lib": ["es2022"] /* code doesnot run on browsers */
+  },
+  "exclude": ["node_modules", "dist"]
+}
