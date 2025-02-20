@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-deployment
+  name: tickets-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: tickets
   template:
     metadata:
       labels:
-        app: auth
+        app: tickets
     spec:
       containers:
-        - image: mistykraken/auth
-          name: auth
+        - image: mistykraken/tickets
+          name: tickets
           resources:
             requests:
               cpu: "20m"
@@ -22,24 +22,24 @@ spec:
           livenessProbe:
             httpGet:
               path: /_status/healthz
-              port: 3001
+              port: 3002
             initialDelaySeconds: 90
             timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /_status/healthz
-              port: 3001
+              port: 3002
             initialDelaySeconds: 30
             timeoutSeconds: 10
           ports:
-            - containerPort: 3001
-              name: auth-port
+            - containerPort: 3002
+              name: tickets-port
           imagePullPolicy: Never
           env:
             - name: DB_MONGO_URL
-              value: mongodb://auth-mongo-srv:27017/auth
+              value: mongodb://tickets-mongo-srv:27017/tickets
             - name: NODE_PORT
-              value: "3001"
+              value: "3002"
             - name: NODE_ENV
               value: "dev"
             # - name: JWT_SECRET
@@ -54,11 +54,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: auth-srv
+  name: tickets-srv
 spec:
   selector:
-    app: auth
+    app: tickets
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 3002
+      targetPort: 3002
       protocol: TCP

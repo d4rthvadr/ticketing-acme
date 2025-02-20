@@ -1,26 +1,34 @@
-apiVersion: skaffold/v4beta3
+apiVersion: skaffold/v2alpha3
 kind: Config
-manifests:
-  rawYaml:
-  - ./infra/k8s/*
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
 build:
   local:
     push: false
   artifacts:
-  - image: mistykraken/auth
-    context: auth
-    docker:
-      dockerfile: Dockerfile
-    sync:
-      manual:
-      - src: 'src/**/*.ts'
-        dest: .
-  - image: mistykraken/client
-    context: client
-    docker:
-      dockerfile: Dockerfile
-    sync:
-      manual:
-      - src: '**/*.js'
-        dest: .
-
+    - image: mistykraken/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: mistykraken/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: mistykraken/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.js"
+            dest: .
