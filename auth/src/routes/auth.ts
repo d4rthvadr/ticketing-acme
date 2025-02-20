@@ -1,11 +1,11 @@
 import express, { type Request, type Response } from 'express';
 import { body } from 'express-validator';
-import { validateRequest } from '../middlewares/validations/requestValidation';
 import { User, type UserDocument } from '../models/user';
-import { BadRequestError } from '../shared/error';
 import { getUser } from '../db/repositories/user';
 import { Password } from '../utils/password';
-import { signJwtToken } from '../utils/jwt';
+import { signJwtToken, validateRequest } from '@vtex-tickets/common';
+
+const jwtSecret: string = process.env.JWT_SECRET;
 
 const router = express.Router();
 // /api/users/signup
@@ -30,11 +30,11 @@ router.post(
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
+      console.log('User already exists');
       // TODO: use actual logger instead
-      throw new BadRequestError('User already exists');
+      return res.status(400).send({errors: ['User already exists']});
     }
 
-    try {
       const user: UserDocument = User.build({
         email,
         password,
@@ -42,7 +42,10 @@ router.post(
 
       await user.save();
 
-      const userJwt = signJwtToken(user);
+      const userJwt = signJwtToken({
+        id: user?._id?.toString(),
+        email: user.email,
+      }, jwtSecret);
 
       req.session = {
         ...req.session,
@@ -50,12 +53,10 @@ router.post(
       };
 
       return res.status(201).send({ user });
-    } catch (err) {
-      console.log('Error', err);
-      throw err;
-    }
+
   },
 );
+
 
 // /api/users/signin
 router.post(
@@ -66,15 +67,16 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    try {
       const { email, password } = req.body;
 
       const existingUser: UserDocument = await getUser({
         email,
       });
 
+      console.log('existingUser', existingUser);
+
       if (!existingUser) {
-        throw new BadRequestError('Invalid credentials');
+        return res.status(400).send({errors: ['Account not found or invalid credentials']});
       }
 
       const passwordMatch = await Password.compare(
@@ -83,19 +85,19 @@ router.post(
       );
 
       if (!passwordMatch) {
-        throw new BadRequestError('Invalid credentials');
+        return res.status(400).send({errors: ['Account not found or invalid credentials']});
       }
 
-      const userJwt = signJwtToken(existingUser);
       req.session = {
         ...req.session,
-        jwt: userJwt,
+        jwt: signJwtToken({
+          id: existingUser?._id?.toString(),
+          email: existingUser.email,
+        }, jwtSecret),
       };
 
-      return res.send({});
-    } catch (err) {
-      throw err;
-    }
+      return res.status(201).send({});
+
   },
 );
 

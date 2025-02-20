@@ -1,18 +1,19 @@
-import express, { type Request, type Response } from 'express';
-import { currentUser, requireAuth } from './../middlewares/jwt';
+import { currentUser, requireAuth } from '@vtex-tickets/common';
+import type { Request, Response } from 'express';
+import express from 'express';
 
 const router = express.Router();
 
+// api/users/currentuser
 router.get(
   '/currentuser',
-  currentUser,
   requireAuth,
+  currentUser,
   (req: Request, res: Response) => {
-    const currentUser = req.user;
 
     // enrich currentUser with additional fields if necessary
 
-    return res.send({ currentUser: currentUser || null });
+    return res.send({ currentUser: req?.user || null });
   },
 );
 

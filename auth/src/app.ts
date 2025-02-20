@@ -1,8 +1,8 @@
 import express, { json, type Request, type Response } from 'express';
 import dotenv from 'dotenv';
 import { userRoutes, authRoutes } from './routes';
-import { errorHandler } from './middlewares/errorHandler';
 import cookieSession from 'cookie-session';
+import { errorHandler } from '@vtex-tickets/common';
 
 dotenv.config();
 
@@ -12,8 +12,7 @@ app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: false,
-    // secure: process.env.NODE_ENV === 'dev' ? false : true,
+    secure: process.env.NODE_ENV === 'dev' ? false : true,
   }),
 );
 

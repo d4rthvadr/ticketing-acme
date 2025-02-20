@@ -1,34 +1,16 @@
-import { app } from 'app';
+import { getEnv, validateEnv } from './env';
+import { app } from './app';
 import { Server } from 'http';
 import mongoose from 'mongoose';
 
-/**
- * The port number on which the server will listen.
- */
 const PORT = process.env.NODE_PORT;
+process.env.JWT_SECRET = 'SOME_SECRET';
 let server: Server | undefined;
-
-/**
- * The required environment variables.
- */
-const REQUIRED_ENVS = ['NODE_PORT', 'DB_MONGO_URL', 'JWT_SECRET'] as const;
 
 /**
  * The timeout duration for the server.
  */
-const TIME_OUT = 6 * 60 * 1000;
-
-/**
- * Validates the presence of required environment variables.
- * Throws an error if any of the required variables are missing.
- */
-const validateEnv = () => {
-  REQUIRED_ENVS.forEach((env) => {
-    if (!process.env[env]) {
-      throw new Error(`${env} must be defined`);
-    }
-  });
-};
+const SERVER_TIME_OUT = 30 * 1000;
 
 /**
  * The possible signals for graceful shutdown.
@@ -36,19 +18,19 @@ const validateEnv = () => {
 type Signals =
   | 'uncaughtException'
   | 'unhandledRejection'
-  | 'SIGNINT'
-  | 'SIGNTERM';
+  | 'SIGINT'
+  | 'SIGTERM';
 
 /**
  * Registers a signal for graceful shutdown.
  * @param signal - The signal to register.
  * @param opts - Additional options for the signal.
  */
-const registerSignalGracefulShutdown = (signal: Signals, opts: {}) => {
+const registerSignalGracefulShutdown = (signal: Signals) => {
   // Handle signal
-  process.on(signal, async () => {
+  process.on(signal, async (err) => {
     console.log(`${signal} signal received: closing HTTP server`);
-
+    console.log('peek error', err);
     await handleSignalShutdown();
   });
 };
@@ -58,6 +40,7 @@ const registerSignalGracefulShutdown = (signal: Signals, opts: {}) => {
  */
 const handleSignalShutdown = async () => {
   if (server) {
+    //@ts-ignore
     const serverClosurePromise = new Promise<void>((resolve, _): void => {
       if (server) {
         server.close((err) => {
@@ -76,10 +59,10 @@ const handleSignalShutdown = async () => {
 };
 
 // Register signal handlers for graceful shutdown
-registerSignalGracefulShutdown('uncaughtException', {});
-registerSignalGracefulShutdown('unhandledRejection', {});
-registerSignalGracefulShutdown('SIGNINT', {});
-registerSignalGracefulShutdown('SIGNTERM', {});
+registerSignalGracefulShutdown('uncaughtException');
+registerSignalGracefulShutdown('unhandledRejection');
+registerSignalGracefulShutdown('SIGINT');
+registerSignalGracefulShutdown('SIGTERM');
 
 /**
  * Connects to the MongoDB database.
@@ -94,24 +77,20 @@ const connectDB = async (mongoDbUrl: string) => {
  * Starts the server.
  */
 const onStart = async () => {
-  if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_KEY must be defined');
-  }
+  const { DB_MONGO_URL } = getEnv();
   try {
-    await connectDB(process.env.DB_MONGO_URL!);
+    await connectDB(DB_MONGO_URL);
     server = app.listen(PORT, () => {
       console.log(`Listening on ${PORT}`);
     });
 
-    server.setTimeout(TIME_OUT);
+    server!.setTimeout(SERVER_TIME_OUT);
   } catch (err) {
     console.log(err);
     process.exit(-1);
   }
 };
 
-// Validate environment variables
 validateEnv();
 
-// Start the server
 onStart();

@@ -1,9 +1,11 @@
-import { UserContextToken } from './interfaces/user';
+import { UserContextToken } from './src/interfaces/user';
 
 declare global {
-  declare namespace Express {
-    interface Request {
-      user: UserContextToken;
+  namespace Express {
+    export interface Request {
+      user?: UserContextToken;
     }
   }
 }
+
+export {};
