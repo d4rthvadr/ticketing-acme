@@ -1,7 +1,24 @@
+import { getCurrentUser } from "../api";
 
-const comp = () => {
-    // @ts-ignore
-    return <h1>Landing page</h1>
+const LandingPage = ({ currentUser }) => {
+
+  const hasSession = !!currentUser;
+
+  const content = hasSession ? (
+    <h1>You are signed in</h1>
+  ) : (
+    <h1>You are NOT signed in</h1>
+  );
+  return content;
+};
+
+LandingPage.getInitialProps = async (context) => {
+
+  const  response  = await getCurrentUser(context)
+
+  return {
+    currentUser: response?.data ?? null,
+  };
 }
 
-export default comp;
+export default LandingPage;
