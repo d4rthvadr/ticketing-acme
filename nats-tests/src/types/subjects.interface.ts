@@ -1,4 +1,4 @@
-import { Subjects } from "./subjects.enum";
+import { Subjects } from "../types/subjects.enum";
 
 export interface TicketCreatedEvent {
   topic: Subjects;

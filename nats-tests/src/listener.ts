@@ -1,8 +1,11 @@
-import nats from "node-nats-streaming";
-import { Subjects } from "./subjects.enum";
-import { TicketCreatedEvent } from "./subjects.interface";
+import nats, { Message } from "node-nats-streaming";
+import { genID } from "./util/id-generator";
+import { Subjects } from "./types/subjects.enum";
+import { TicketCreatedEvent } from "./types/subjects.interface";
 
-const stan = nats.connect("ticketing", "123", {
+const clientId: string = genID('clientId');
+
+const stan = nats.connect("ticketing", clientId, {
   url: "http://localhost:4222",
 });
 
@@ -10,7 +13,12 @@ stan.on("connect", () => {
   console.log("Listener connected to NATS");
 
   const subscription = stan.subscribe(Subjects.TicketCreated);
-  subscription.on("message", (msg: TicketCreatedEvent['payload']) => {
-    console.log("Message received", msg);
+  subscription.on("message", (msg: Message) => {
+
+
+    const data: TicketCreatedEvent['payload'] = JSON.parse(msg.getData().toString());
+
+
+    console.log("Message received", data);
   });
 });

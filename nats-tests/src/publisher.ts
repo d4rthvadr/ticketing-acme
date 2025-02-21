@@ -1,9 +1,12 @@
 import nats from "node-nats-streaming";
-import { TicketCreatedEvent } from "./subjects.interface";
-import { Subjects } from "./subjects.enum";
+import { genID } from "./util/id-generator";
+import { TicketCreatedEvent } from "./types/subjects.interface";
+import { Subjects } from "./types/subjects.enum";
+
+const clientId: string = genID('clientId');
 
 // stan is the client that connects to the nats server
-const stan = nats.connect("ticketing", "abc", {
+const stan = nats.connect("ticketing", clientId, {
   url: "http://localhost:4222",
 });
 
