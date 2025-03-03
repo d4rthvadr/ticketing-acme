@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "rootDir": "src" /* Specify the root folder within your source files. */,
+    "outDir": "dist",
+    "target": "es2020",
+    "module": "commonjs",
+    "lib": ["esnext"],
+    "strict": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": false,
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["src/**/*.ts", "thirdparty.d.ts", ".eslintrc.js"],
+  "ts-node": {
+    "files": true
+  }
+}
