@@ -1,13 +1,17 @@
 import request from "supertest";
 import { app } from "../app";
 import { setUpEnv } from "./helpers/env";
-import { faker } from "@faker-js/faker";
 import { Ticket } from "../domain/models/ticket.model";
 import mongoose from "mongoose";
+import NatsWrapper from "../../src/libs/nats-wrapper";
 
 setUpEnv();
 
-const createTicketHelper = async (title: string, price: number, cookie: string[]) => {
+const createTicketHelper = async (
+  title: string,
+  price: number,
+  cookie: string[]
+) => {
   // create a ticket
   return await request(app).post("/api/tickets").set("Cookie", cookie).send({
     title,
@@ -16,7 +20,7 @@ const createTicketHelper = async (title: string, price: number, cookie: string[]
 };
 
 describe("Tickets controller", () => {
-  const title: string = faker.string.alpha(34);
+  const title: string = "concert";
   const price: number = 20;
   const ticketId: string = new mongoose.Types.ObjectId().toHexString();
   let cookie: string[];
@@ -88,7 +92,6 @@ describe("Tickets controller", () => {
       expect(response.status).toEqual(404);
     });
     it("should return ticket if found", async () => {
-
       // create a ticket
       let response = await createTicketHelper(title, price, cookie);
 
@@ -117,10 +120,7 @@ describe("Tickets controller", () => {
     });
   });
 
-
-
   describe("Update tickets", () => {
-
     it("should return a 404 if ticket not found", async () => {
       // create a ticket
       await createTicketHelper(title, price, cookie);
@@ -130,7 +130,7 @@ describe("Tickets controller", () => {
         .set("Cookie", cookie)
         .send({
           title,
-          price
+          price,
         });
 
       expect(response.status).toEqual(200);
@@ -149,7 +149,6 @@ describe("Tickets controller", () => {
     });
 
     it("should return a 401 if user does not own the ticket", async () => {
-
       // create a ticket
       const response = await createTicketHelper(title, price, cookie);
 
@@ -165,7 +164,24 @@ describe("Tickets controller", () => {
         .expect(401);
     });
 
-  });
+    it("should publish an event", async () => {
+      // create a ticket
+      const response = await createTicketHelper(title, price, cookie);
 
-  
+      await request(app)
+        .put(`/api/tickets/${response.body.id}`)
+        .set("Cookie", cookie)
+        .send({
+          title: "new title",
+          price: 100,
+        })
+        .expect(201);
+
+        console.log("1", NatsWrapper.getClient());
+        console.log("2",NatsWrapper.connect)
+
+        expect(NatsWrapper.getClient().publish).toHaveBeenCalled();
+
+    });
+  });
 });

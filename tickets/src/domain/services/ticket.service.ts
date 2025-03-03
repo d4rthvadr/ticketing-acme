@@ -2,9 +2,13 @@ import { NotAuthorizedError, NotFoundError } from "@vtex-tickets/common";
 import { Ticket, TicketDocument, TicketModel } from "../models/ticket.model";
 import { CreateTicketDto } from "./dto/create-ticket.dto";
 import { UpdateTicketDto } from "./dto/update-ticket.dto";
-
+import { TicketCreatedPublisher } from "../publishers/ticket-created.publisher";
+import { TicketUpdatedPublisher } from "../publishers/ticket-updated.publisher";
+import NatsWrapper from "../../libs/nats-wrapper";
 export class TicketService {
   private ticketRepository: TicketModel;
+
+  private natsClient = NatsWrapper.getClient();
 
   constructor() {
     this.ticketRepository = Ticket;
@@ -37,6 +41,16 @@ export class TicketService {
 
     await ticket.save();
 
+    await new TicketCreatedPublisher(this.natsClient).publish({
+      payload: {
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+      },
+      version: 1,
+    });
+
     return ticket;
   }
 
@@ -65,15 +79,15 @@ export class TicketService {
 
   /**
    * Updates an existing ticket with new details.
-   * 
+   *
    * @param {UpdateTicketDto} updateTicket - The data transfer object containing the updated ticket details.
    * @param {string} updateTicket.title - The new title of the ticket.
    * @param {number} updateTicket.price - The new price of the ticket.
    * @param {string} updateTicket.id - The ID of the ticket to be updated.
    * @param {string} updateTicket.userId - The ID of the user requesting the update.
-   * 
+   *
    * @returns {Promise<TicketDocument>} - A promise that resolves to the updated ticket document.
-   * 
+   *
    * @throws {NotAuthorizedError} - If the user is not authorized to update the ticket.
    */
   async update(updateTicket: UpdateTicketDto): Promise<TicketDocument> {
@@ -93,6 +107,17 @@ export class TicketService {
     });
 
     await ticket.save();
+    console.log("peek: ticket saved", ticket)
+
+    await new TicketUpdatedPublisher(this.natsClient).publish({
+      payload: {
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+      },
+      version: 1,
+    });
 
     return ticket;
   }
@@ -104,7 +129,10 @@ export class TicketService {
    * @param resource - The resource object containing the user ID.
    * @returns `true` if the user is the owner of the resource, otherwise `false`.
    */
-  private isResourceOwner(userId: string, resource: { userId: string}): boolean {
+  private isResourceOwner(
+    userId: string,
+    resource: { userId: string }
+  ): boolean {
     return resource.userId === userId;
   }
 }

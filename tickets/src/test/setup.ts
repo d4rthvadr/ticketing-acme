@@ -6,9 +6,25 @@ declare global {
   var signin: (userId?: string) => string[];
 }
 
+jest.mock("../libs/nats-wrapper", () => {
+  return {
+    __esModule: true,
+    default: {
+      getClient: () => {
+        return {
+          publish: jest.fn().mockImplementation((subject: string, data: string, callback: () => void) => {
+            callback();
+          }),
+        };
+      },
+    },
+  };
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
+
 
   mongoServer = await MongoMemoryServer.create({});
   const mongoUri = mongoServer.getUri();
@@ -24,6 +40,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  jest.clearAllMocks();
+
   const collections = await mongoose.connection.db.collections();
 
   collections.map(async (collection) => await collection.deleteMany({}));

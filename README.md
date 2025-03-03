@@ -75,3 +75,26 @@ docker images --filter "dangling=true" --quiet | xargs docker rmi -f
 kubectl port-forward nats-depl-XXXXX-XXXX 4222:4222
 
 ```
+
+
+### Notes
+Nats
+1.  CLientId:
+    - Used in NATS Streaming (deprecated in favor of JetStream).
+    - Identifies a unique client connection to the NATS Streaming server.
+    - Must be unique across clients connecting to the same streaming server.
+    - If two clients use the same clientId, the second client forces the first one to disconnect.
+2. ClusterId
+    - Represents the NATS Streaming cluster name.
+    - Used to differentiate multiple independent streaming clusters running on the same infrastructure.
+    - Clients connecting to a cluster must specify the correct clusterId.     
+
+
+### Strategies to solve common microservices problems
+1. Outbox-pattern (Dual-write problem)
+2. Retry mechanism
+3. Saga Pattern for distributed transactions
+4. Fallback pattern
+5. Retry + circuit breaker pattern
+6. Buildhead pattern
+
