@@ -4,7 +4,7 @@ import type { TicketAttributes } from '../interfaces/ticket.interface';
 export interface TicketDocument extends mongoose.Document, TicketAttributes {}
 
 export interface TicketModel extends mongoose.Model<TicketDocument> {
-  build(att: TicketAttributes): any;
+  build(att: TicketAttributes): TicketDocument;
 }
 
 const ticketSchema = new mongoose.Schema(
