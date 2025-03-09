@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { signJwtToken } from "@vtex-tickets/common";
+import { randomBytes } from "crypto";
 
 declare global {
   var signin: (userId?: string) => string[];
@@ -54,9 +55,9 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-global.signin = (userId: string) => {
+global.signin = (userId: string | undefined) => {
   const payload = {
-    id: userId ?? "123",
+    id: userId ?? randomBytes(6).toString("hex"),
     email: "email@example.com",
   };
 

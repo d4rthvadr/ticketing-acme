@@ -136,3 +136,5 @@ export class TicketService {
     return resource.userId === userId;
   }
 }
+
+export const ticketService: TicketService = new TicketService();

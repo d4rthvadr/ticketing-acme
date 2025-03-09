@@ -1,16 +1,13 @@
 import { body } from "express-validator";
 import express, { type Request, type Response } from "express";
-import { CastError } from "mongoose";
 import {
   currentUser,
   requireAuth,
   validateRequest,
 } from "@vtex-tickets/common";
-import { TicketService } from "../domain/services/ticket.service";
+import { ticketService } from "../domain/services/ticket.service";
 import { TicketDocument } from "../domain/models/ticket.model";
 import { asyncHandler } from "../utils/async-handler";
-
-const ticketService = new TicketService();
 
 const router = express.Router();
 
