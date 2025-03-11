@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import type { TicketAttributes } from '../interfaces/ticket.interface';
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
-export interface TicketDocument extends mongoose.Document, TicketAttributes {}
+export interface TicketDocument extends mongoose.Document, TicketAttributes {
+  version: number;
+}
 
 export interface TicketModel extends mongoose.Model<TicketDocument> {
   build(att: TicketAttributes): TicketDocument;
@@ -28,13 +31,13 @@ const ticketSchema = new mongoose.Schema(
         ret.id = ret._id;
         delete ret._id;
       },
-      versionKey: false,
     },
     strict: true,
   }
 );
 
-
+ticketSchema.set("versionKey", "version");
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (att: TicketAttributes) => {
   return new Ticket(att);

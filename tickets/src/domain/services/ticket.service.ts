@@ -2,16 +2,14 @@ import { NotAuthorizedError, NotFoundError } from "@vtex-tickets/common";
 import { Ticket, TicketDocument, TicketModel } from "../models/ticket.model";
 import { CreateTicketDto } from "./dto/create-ticket.dto";
 import { UpdateTicketDto } from "./dto/update-ticket.dto";
-import { TicketCreatedPublisher } from "../publishers/ticket-created.publisher";
-import { TicketUpdatedPublisher } from "../publishers/ticket-updated.publisher";
+import { TicketCreatedPublisher } from "../events/publishers/ticket-created.publisher";
+import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated.publisher";
 import NatsWrapper from "../../libs/nats-wrapper";
 export class TicketService {
-  private ticketRepository: TicketModel;
-
-  private natsClient = NatsWrapper.getClient();
+  private ticketModel: TicketModel;
 
   constructor() {
-    this.ticketRepository = Ticket;
+    this.ticketModel = Ticket;
   }
 
   /**
@@ -20,7 +18,7 @@ export class TicketService {
    * @returns {Promise<TicketDocument[]>} A promise that resolves to an array of TicketDocument objects.
    */
   async list(): Promise<TicketDocument[]> {
-    const tickets: TicketDocument[] = await this.ticketRepository.find({});
+    const tickets: TicketDocument[] = await this.ticketModel.find({});
 
     return tickets;
   }
@@ -32,26 +30,31 @@ export class TicketService {
    * @returns {Promise<TicketDocument>} A promise that resolves to the created ticket document.
    */
   async createTicket(createTicket: CreateTicketDto): Promise<TicketDocument> {
-    const { title, price, userId } = createTicket;
-    const ticket: TicketDocument = this.ticketRepository.build({
-      title,
-      price,
-      userId,
-    });
+    try {
+      const { title, price, userId } = createTicket;
+      const ticket: TicketDocument = this.ticketModel.build({
+        title,
+        price,
+        userId,
+      });
 
-    await ticket.save();
+      await ticket.save();
 
-    await new TicketCreatedPublisher(this.natsClient).publish({
-      payload: {
-        id: ticket.id,
-        title: ticket.title,
-        price: ticket.price,
-        userId: ticket.userId,
-      },
-      version: 1,
-    });
+      await new TicketCreatedPublisher(NatsWrapper.getClient()).publish({
+        payload: {
+          id: ticket.id,
+          title: ticket.title,
+          price: ticket.price,
+          userId: ticket.userId,
+          version: ticket.version
+        },
+      });
 
-    return ticket;
+      return ticket;
+    } catch (err) {
+      console.log("error creating ticket", err);
+      throw err;
+    }
   }
 
   /**
@@ -62,19 +65,14 @@ export class TicketService {
    * @throws NotFoundError if the ticket with the specified ID is not found.
    */
   async findById(ticketId: string): Promise<TicketDocument | null> {
-    try {
-      const ticket: TicketDocument | null =
-        await this.ticketRepository.findById(ticketId);
+    const ticket: TicketDocument | null =
+      await this.ticketModel.findById(ticketId);
 
-      if (!ticket) {
-        throw new NotFoundError(`Ticket with id ${ticketId} not found`);
-      }
-
-      return ticket;
-    } catch (err) {
-      console.log("err", err);
-      throw err;
+    if (!ticket) {
+      throw new NotFoundError(`Ticket with id ${ticketId} not found`);
     }
+
+    return ticket;
   }
 
   /**
@@ -93,33 +91,37 @@ export class TicketService {
   async update(updateTicket: UpdateTicketDto): Promise<TicketDocument> {
     const { title, price, id, userId } = updateTicket;
 
-    const ticket: TicketDocument = await this.findById(id);
+    try {
+      const ticket: TicketDocument = await this.findById(id);
 
-    if (!this.isResourceOwner(userId, ticket)) {
-      throw new NotAuthorizedError(
-        "You are not authorized to update this ticket"
-      );
+      if (!this.isResourceOwner(userId, ticket)) {
+        throw new NotAuthorizedError(
+          "You are not authorized to update this ticket"
+        );
+      }
+
+      ticket.set({
+        title,
+        price,
+      });
+
+      await ticket.save();
+
+      await new TicketUpdatedPublisher(NatsWrapper.getClient()).publish({
+        payload: {
+          id: ticket.id,
+          title: ticket.title,
+          price: ticket.price,
+          userId: ticket.userId,
+          version: ticket.version
+        },
+      });
+
+      return ticket;
+    } catch (err) {
+      console.log("error updating ticket", err);
+      throw err;
     }
-
-    ticket.set({
-      title,
-      price,
-    });
-
-    await ticket.save();
-    console.log("peek: ticket saved", ticket)
-
-    await new TicketUpdatedPublisher(this.natsClient).publish({
-      payload: {
-        id: ticket.id,
-        title: ticket.title,
-        price: ticket.price,
-        userId: ticket.userId,
-      },
-      version: 1,
-    });
-
-    return ticket;
   }
 
   /**
