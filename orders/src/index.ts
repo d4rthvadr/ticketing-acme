@@ -4,6 +4,7 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import NatsWrapper from "./libs/nats-wrapper";
 import { randomBytes } from "crypto";
+import { initializeEventListeners } from "./domain/events/init-listeners";
 
 const PORT = process.env.NODE_PORT;
 process.env.JWT_SECRET = "SOME_SECRET";
@@ -85,6 +86,7 @@ const connectNats = async (
   console.log("NATS connection established");
 };
 
+
 /**
  * Starts the server.
  */
@@ -98,6 +100,10 @@ const onStart = async () => {
 
     // MongoDB connection
     await connectDB(DB_MONGO_URL);
+
+    // Initialize listeners
+    initializeEventListeners();
+
     server = app.listen(PORT, () => {
       console.log(`Listening on ${PORT}`);
     });

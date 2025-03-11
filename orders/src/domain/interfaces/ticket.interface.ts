@@ -1,7 +1,5 @@
 export interface TicketAttributes {
-    title: string;
-    price: number;
-    version: number;
-    userId: string;
-  }
-  
+  ticketId: string;
+  title: string;
+  price: number;
+}

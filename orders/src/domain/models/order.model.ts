@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 import type { OrderAttributes } from '../interfaces/order.interface';
 import { OrderStatus } from "@vtex-tickets/common";
 
-export interface OrderDocument extends mongoose.Document, OrderAttributes {}
+export interface OrderDocument extends mongoose.Document, OrderAttributes {
+  version?: number;
+}
 
 export interface OrderModel extends mongoose.Model<OrderDocument> {
-  build(att: OrderAttributes): any;
+  build(att: OrderAttributes): OrderDocument;
 }
 
 const orderSchema = new mongoose.Schema(
@@ -41,9 +43,7 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-
-
-orderSchema.statics.build = (att: OrderAttributes) => {
+orderSchema.statics.build = (att: OrderAttributes): OrderDocument => {
   return new Order(att);
 };
 
