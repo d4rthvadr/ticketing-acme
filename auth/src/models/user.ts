@@ -5,7 +5,7 @@ import type { UserAttributes } from '../interfaces/user';
 export interface UserDocument extends mongoose.Document, UserAttributes {}
 
 interface UserModel extends mongoose.Model<UserDocument> {
-  build(att: UserAttributes): any;
+  build(att: UserAttributes): UserDocument;
 }
 
 const userSchema = new mongoose.Schema(

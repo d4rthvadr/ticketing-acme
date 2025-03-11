@@ -7,8 +7,8 @@ const router = express.Router();
 // api/users/currentuser
 router.get(
   '/currentuser',
-  requireAuth,
   currentUser,
+  requireAuth,
   (req: Request, res: Response) => {
 
     // enrich currentUser with additional fields if necessary
