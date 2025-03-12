@@ -46,7 +46,7 @@ export class TicketService {
           title: ticket.title,
           price: ticket.price,
           userId: ticket.userId,
-          version: ticket.version
+          version: ticket.version,
         },
       });
 
@@ -58,13 +58,41 @@ export class TicketService {
   }
 
   /**
+   * Reserves a ticket by associating it with an order.
+   *
+   * @param ticketId - The ID of the ticket to be reserved.
+   * @param orderId - The ID of the order to associate with the ticket.
+   * @returns A promise that resolves to the updated ticket document.
+   */
+  async reserveTicket(
+    ticketId: string,
+    orderId: string
+  ): Promise<TicketDocument> {
+
+    try{
+
+      const ticket: TicketDocument = await this.findById(ticketId);
+  
+      ticket.set({ orderId });
+      await ticket.save();
+  
+      return ticket;
+    
+    }catch(err) {
+      console.log("error reserving ticket", err);
+      throw err;
+    }
+
+  }
+
+  /**
    * Finds a ticket by its ID.
    *
    * @param ticketId - The ID of the ticket to find.
-   * @returns A promise that resolves to the found ticket document or null if not found.
+   * @returns A promise that resolves to the found ticket document.
    * @throws NotFoundError if the ticket with the specified ID is not found.
    */
-  async findById(ticketId: string): Promise<TicketDocument | null> {
+  async findById(ticketId: string): Promise<TicketDocument> {
     const ticket: TicketDocument | null =
       await this.ticketModel.findById(ticketId);
 
@@ -113,7 +141,7 @@ export class TicketService {
           title: ticket.title,
           price: ticket.price,
           userId: ticket.userId,
-          version: ticket.version
+          version: ticket.version,
         },
       });
 
