@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import type { OrderAttributes } from '../interfaces/order.interface';
 import { OrderStatus } from "@vtex-tickets/common";
-
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 export interface OrderDocument extends mongoose.Document, OrderAttributes {
   version: number;
 }
@@ -37,11 +37,13 @@ const orderSchema = new mongoose.Schema(
         ret.id = ret._id;
         delete ret._id;
       },
-      versionKey: false,
     },
     strict: true,
   }
 );
+
+orderSchema.set("versionKey", "version");
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (att: OrderAttributes): OrderDocument => {
   return new Order(att);
