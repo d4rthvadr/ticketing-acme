@@ -3,7 +3,7 @@ import type { OrderAttributes } from '../interfaces/order.interface';
 import { OrderStatus } from "@vtex-tickets/common";
 
 export interface OrderDocument extends mongoose.Document, OrderAttributes {
-  version?: number;
+  version: number;
 }
 
 export interface OrderModel extends mongoose.Model<OrderDocument> {

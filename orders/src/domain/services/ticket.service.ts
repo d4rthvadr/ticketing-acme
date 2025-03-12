@@ -32,6 +32,8 @@ export class TicketService {
     });
 
     if (!ticket) {
+      console.error("Ticket not found", {version, ticketId});
+
       throw new NotFoundError("Ticket not found");
     }
 
