@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": "src" /* Specify the root folder within your source files. */,
+    "outDir": "dist",
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["esnext"],
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": false,
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["src/**/*.ts"],
+  "ts-node": {
+    "files": true,
+    "transpileOnly": true
+  }
+}
