@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": false,
     "esModuleInterop": true,
-    "baseUrl": "./src",
-    "typeRoots": ["./node_modules/@types"]
+    "baseUrl": "./src"
   },
   "include": ["src/**/*.ts"],
   "ts-node": {

@@ -2,6 +2,7 @@ import { getEnv, validateEnv } from "./env";
 import { Server } from "http";
 import NatsWrapper from "./libs/nats-wrapper";
 import { randomBytes } from "crypto";
+import { initializeEventListeners } from "./domain/events/init-listeners";
 
 const PORT = process.env.NODE_PORT;
 process.env.JWT_SECRET = "SOME_SECRET";
@@ -75,6 +76,9 @@ const onStart = async () => {
   try {
     // Nats connection
     await connectNats(NATS_CLUSTER_ID, natsClientId, NATS_URL);
+
+    // Listen for NATS events
+    await initializeEventListeners();
   } catch (err) {
     console.log(err);
     process.exit(-1);
