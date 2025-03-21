@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+    spec:
+      containers:
+        - image: mistykraken/payments
+          name: payments
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "55M"
+          livenessProbe:
+            httpGet:
+              path: /_status/healthz
+              port: 3004
+            initialDelaySeconds: 90
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /_status/healthz
+              port: 3004
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          ports:
+            - containerPort: 3004
+              name: payments-port
+          imagePullPolicy: Never
+          env:
+            - name: DB_MONGO_URL
+              value: mongodb://payments-mongo-srv:27017/payments
+            - name: NODE_PORT
+              value: "3002"
+            - name: NODE_ENV
+              value: "dev"
+            - name: NATS_URL
+              value: "nats://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: "ticketing"
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            # - name: JWT_SECRET
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: jwt-secret
+            #       key: JWT_KEY
+
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: payments-srv
+spec:
+  selector:
+    app: payments
+  ports:
+    - port: 3004
+      targetPort: 3004
+      protocol: TCP
