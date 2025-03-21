@@ -11,13 +11,21 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
     try {
       const { id: orderId } = data;
 
-      console.log(`${this.subject} finished successfully!`, `Order ID: ${orderId}`);
+      const delay: number = new Date(data.expiresAt).getTime() - new Date().getTime();
+      console.log("Expiration delay in ms:", delay);
 
-      await expirationQueue.add({
-        orderId,
-      });
+      await expirationQueue.add(
+        {
+          orderId,
+        },
+        {
+          delay,
+        },
+      );
 
       msg.ack();
+
+      console.log(`${this.subject} finished successfully!`, `Order ID: ${orderId}`);
     } catch (err) {
       console.log(err);
       throw err;

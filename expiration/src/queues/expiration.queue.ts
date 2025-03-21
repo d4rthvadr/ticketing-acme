@@ -1,5 +1,6 @@
 import Queue, { Job } from "bull";
 import { getEnv } from "../env";
+import { orderService } from "../domain/services/order.service";
 
 const { REDIS_HOST, REDIS_PORT } = getEnv();
 
@@ -16,9 +17,11 @@ const expirationQueue = new Queue<Payload>("expiration", {
 
 expirationQueue.process(async (job: Job<Payload>) => {
   console.log("Processing job with data:", job.data);
-  // Perform the job processing logic here
-  // For example, you can send a notification or update the order status
-  // ...
+
+  const { orderId } = job.data;
+
+  await orderService.expiredOrder(orderId);
+  console.log(`Order with ID ${orderId} has expired`);
 });
 
 export { expirationQueue };
