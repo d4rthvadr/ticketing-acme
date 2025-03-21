@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import type { TicketAttributes } from '../interfaces/ticket.interface';
+import { TicketAttributes } from "../interfaces/ticket.interface";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 export interface TicketDocument extends mongoose.Document, TicketAttributes {
@@ -27,7 +27,7 @@ const ticketSchema = new mongoose.Schema(
     },
     orderId: {
       type: String,
-    }
+    },
   },
   {
     toJSON: {
@@ -37,7 +37,7 @@ const ticketSchema = new mongoose.Schema(
       },
     },
     strict: true,
-  }
+  },
 );
 
 ticketSchema.set("versionKey", "version");
@@ -55,6 +55,5 @@ ticketSchema.statics.build = (att: TicketAttributes) => {
 };
 
 const Ticket = mongoose.model<TicketDocument, TicketModel>("Ticket", ticketSchema);
-
 
 export { Ticket };

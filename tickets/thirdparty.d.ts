@@ -1,4 +1,4 @@
-import { UserContextToken } from './src/interfaces/user';
+import { UserContextToken } from "./src/interfaces/user";
 
 declare global {
   namespace Express {
@@ -8,4 +8,4 @@ declare global {
   }
 }
 
-export {};
+export {}; // Treat this file as a module.

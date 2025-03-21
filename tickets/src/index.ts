@@ -4,6 +4,7 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import NatsWrapper from "./libs/nats-wrapper";
 import { randomBytes } from "crypto";
+import { initializeEventListeners } from "./domain/events/init-listeners";
 
 const PORT = process.env.NODE_PORT;
 process.env.JWT_SECRET = "SOME_SECRET";
@@ -17,11 +18,7 @@ const SERVER_TIME_OUT = 30 * 1000;
 /**
  * The possible signals for graceful shutdown.
  */
-type Signals =
-  | "uncaughtException"
-  | "unhandledRejection"
-  | "SIGINT"
-  | "SIGTERM";
+type Signals = "uncaughtException" | "unhandledRejection" | "SIGINT" | "SIGTERM";
 
 /**
  * Registers a signal for graceful shutdown.
@@ -43,8 +40,7 @@ const handleSignalShutdown = async () => {
   await NatsWrapper.disconnect();
 
   if (server) {
-    //@ts-ignore
-    const serverClosurePromise = new Promise<void>((resolve, _): void => {
+    const serverClosurePromise = new Promise<void>((resolve): void => {
       if (server) {
         server.close((err) => {
           if (err) {
@@ -76,11 +72,7 @@ const connectDB = async (mongoDbUrl: string) => {
   console.log("Mongodb connection established");
 };
 
-const connectNats = async (
-  clusterId: string,
-  clientId: string,
-  url: string
-) => {
+const connectNats = async (clusterId: string, clientId: string, url: string) => {
   await NatsWrapper.connect(clusterId, clientId, url);
   console.log("NATS connection established");
 };
@@ -89,15 +81,18 @@ const connectNats = async (
  * Starts the server.
  */
 const onStart = async () => {
-  const { DB_MONGO_URL, NATS_CLUSTER_ID, NATS_CLIENT_ID , NATS_URL } = getEnv();
+  const { DB_MONGO_URL, NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL } = getEnv();
 
   const natsClientId = NATS_CLIENT_ID ?? `client_${randomBytes(4).toString("hex")}`;
   try {
     // Nats connection
-    await connectNats(NATS_CLUSTER_ID, natsClientId,  NATS_URL);
+    await connectNats(NATS_CLUSTER_ID, natsClientId, NATS_URL);
 
     // MongoDB connection
     await connectDB(DB_MONGO_URL);
+
+    // Initialize listeners
+    initializeEventListeners();
     server = app.listen(PORT, () => {
       console.log(`Listening on ${PORT}`);
     });

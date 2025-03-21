@@ -3,4 +3,5 @@ export interface UpdateTicketDto {
     title: string;
     price: number;
     userId: string;
+    orderId?: string | null;
 }

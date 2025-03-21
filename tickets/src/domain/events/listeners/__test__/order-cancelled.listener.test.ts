@@ -1,18 +1,17 @@
-import { OrderCreatedEvent, OrderStatus } from "@vtex-tickets/common";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { OrderCancelledEvent } from "@vtex-tickets/common";
 import NatsWrapper from "../../../../libs/nats-wrapper";
-import { OrderCreatedListener } from "../order-created.listener";
+import { OrderCancelledListener } from "../order-cancelled.listener";
 import mongoose from "mongoose";
 import { ticketService } from "../../../../domain/services/ticket.service";
 import { CreateTicketDto } from "../../../../domain/services/dto/create-ticket.dto";
 import { Message } from "node-nats-streaming";
 
 const setUp = async (): Promise<{
-  listener: OrderCreatedListener;
+  listener: OrderCancelledListener;
   msg: Message;
-  data: OrderCreatedEvent["payload"];
+  data: OrderCancelledEvent["payload"];
 }> => {
-    const listener = new OrderCreatedListener(NatsWrapper.getClient());
-
   const ticketData: CreateTicketDto = {
     title: "concert",
     price: 20,
@@ -21,15 +20,14 @@ const setUp = async (): Promise<{
 
   const ticket = await ticketService.createTicket(ticketData);
 
-  const data: OrderCreatedEvent["payload"] = {
+  const listener = new OrderCancelledListener(NatsWrapper.getClient());
+
+  const data: OrderCancelledEvent["payload"] = {
     id: new mongoose.Types.ObjectId().toHexString(),
-    expiresAt: new Date().toISOString(),
     userId: ticket.userId,
     ticket: {
       id: ticket.id,
-      price: ticket.price,
     },
-    status: OrderStatus.Created,
     version: 0,
   };
 
@@ -48,7 +46,7 @@ const setUp = async (): Promise<{
   return { listener, data, msg };
 };
 
-it("should set the orderId of the ticket", async () => {
+it("should set the orderId to undefined of the ticket", async () => {
   const { listener, data, msg } = await setUp();
 
   await listener.onMessage(data, msg);
@@ -56,7 +54,7 @@ it("should set the orderId of the ticket", async () => {
   const ticket = await ticketService.findById(data.ticket.id);
 
   expect(ticket).toBeDefined();
-  expect(ticket.orderId).toEqual(data.id);
+  expect(ticket.orderId).toBeUndefined();
 });
 
 it("should acknowledge the message", async () => {
@@ -67,10 +65,3 @@ it("should acknowledge the message", async () => {
   expect(msg.ack).toHaveBeenCalled();
 });
 
-it("should publish a ticket updated event", async () => {
-  const { listener, data, msg } = await setUp();
-
-  await listener.onMessage(data, msg);
-
-  // expect(NatsWrapper.getClient().publish).toHaveBeenCalled();
-});

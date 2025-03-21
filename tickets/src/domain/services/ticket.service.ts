@@ -1,4 +1,4 @@
-import { NotAuthorizedError, NotFoundError } from "@vtex-tickets/common";
+import { BadRequestError, NotAuthorizedError, NotFoundError } from "@vtex-tickets/common";
 import { Ticket, TicketDocument, TicketModel } from "../models/ticket.model";
 import { CreateTicketDto } from "./dto/create-ticket.dto";
 import { UpdateTicketDto } from "./dto/update-ticket.dto";
@@ -64,25 +64,29 @@ export class TicketService {
    * @param orderId - The ID of the order to associate with the ticket.
    * @returns A promise that resolves to the updated ticket document.
    */
-  async reserveTicket(
-    ticketId: string,
-    orderId: string
-  ): Promise<TicketDocument> {
-
-    try{
-
+  async reserveTicket(ticketId: string, orderId: string): Promise<TicketDocument> {
+    try {
       const ticket: TicketDocument = await this.findById(ticketId);
-  
+
       ticket.set({ orderId });
       await ticket.save();
-  
+
+      await new TicketUpdatedPublisher(NatsWrapper.getClient()).publish({
+        payload: {
+          id: ticketId,
+          orderId: ticket.orderId,
+          version: ticket.version,
+          title: ticket.title,
+          price: ticket.price,
+          userId: ticket.userId,
+        },
+      });
+
       return ticket;
-    
-    }catch(err) {
+    } catch (err) {
       console.log("error reserving ticket", err);
       throw err;
     }
-
   }
 
   /**
@@ -93,8 +97,7 @@ export class TicketService {
    * @throws NotFoundError if the ticket with the specified ID is not found.
    */
   async findById(ticketId: string): Promise<TicketDocument> {
-    const ticket: TicketDocument | null =
-      await this.ticketModel.findById(ticketId);
+    const ticket: TicketDocument | null = await this.ticketModel.findById(ticketId);
 
     if (!ticket) {
       throw new NotFoundError(`Ticket with id ${ticketId} not found`);
@@ -117,25 +120,27 @@ export class TicketService {
    * @throws {NotAuthorizedError} - If the user is not authorized to update the ticket.
    */
   async update(updateTicket: UpdateTicketDto): Promise<TicketDocument> {
-    const { title, price, id, userId } = updateTicket;
+    const { title, price, id, userId, orderId } = updateTicket;
 
     try {
       const ticket: TicketDocument = await this.findById(id);
 
+      if (ticket.orderId) throw new BadRequestError("Cannot edit a reserved ticket");
+
       if (!this.isResourceOwner(userId, ticket)) {
-        throw new NotAuthorizedError(
-          "You are not authorized to update this ticket"
-        );
+        throw new NotAuthorizedError("You are not authorized to update this ticket");
       }
 
       ticket.set({
         title,
         price,
+        orderId,
+        userId,
       });
 
       await ticket.save();
 
-      await new TicketUpdatedPublisher(NatsWrapper.getClient()).publish({
+      await new TicketUpdatedPublisher(NatsWrapper.getClient()!).publish({
         payload: {
           id: ticket.id,
           title: ticket.title,
@@ -152,6 +157,31 @@ export class TicketService {
     }
   }
 
+  async cancelTicket(ticketId: string): Promise<TicketDocument> {
+    try {
+      const ticket: TicketDocument = await this.findById(ticketId);
+
+      ticket.set({ orderId: undefined });
+      await ticket.save();
+
+      await new TicketUpdatedPublisher(NatsWrapper.getClient()).publish({
+        payload: {
+          id: ticketId,
+          orderId: ticket.orderId,
+          version: ticket.version,
+          title: ticket.title,
+          price: ticket.price,
+          userId: ticket.userId,
+        },
+      });
+
+      return ticket;
+    } catch (err) {
+      console.log("error cancelling ticket", err);
+      throw err;
+    }
+  }
+
   /**
    * Checks if the given user is the owner of the resource.
    *
@@ -159,10 +189,7 @@ export class TicketService {
    * @param resource - The resource object containing the user ID.
    * @returns `true` if the user is the owner of the resource, otherwise `false`.
    */
-  private isResourceOwner(
-    userId: string,
-    resource: { userId: string }
-  ): boolean {
+  private isResourceOwner(userId: string, resource: { userId: string }): boolean {
     return resource.userId === userId;
   }
 }

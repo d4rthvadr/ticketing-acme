@@ -1,7 +1,6 @@
 import {
   BaseListener,
   OrderCreatedEvent,
-  OrderStatus,
   Subjects,
 } from "@vtex-tickets/common";
 import { Message } from "node-nats-streaming";
@@ -22,13 +21,14 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
         ticket: { id: ticketId },
       } = data;
 
-      // Find the ticket that the order is reserving
-      await ticketService.reserveTicket(ticketId, id);
+      const reserveTicket = await ticketService.reserveTicket(ticketId, id);
+
+      console.log(`${this.subject} finished successfully!`, reserveTicket);
 
       msg.ack();
     } catch (err) {
-        console.log(err);
-        throw err;
+      console.log(err);
+      throw err;
     }
   }
 }

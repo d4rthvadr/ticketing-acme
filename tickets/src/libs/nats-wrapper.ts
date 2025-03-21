@@ -7,8 +7,10 @@ class NatsWrapper {
   private constructor() {}
 
   static getClient(): Stan {
-
-    return NatsWrapper._client;
+    if (!this._client) {
+      throw new Error("Cannot access NATS client before connecting");
+    }
+    return this._client;
   }
 
   static async disconnect() {
@@ -18,11 +20,7 @@ class NatsWrapper {
     console.log("NATS client closed");
   }
 
-  static async connect(
-    clusterId: string,
-    clientId: string,
-    url: string
-  ): Promise<void> {
+  static async connect(clusterId: string, clientId: string, url: string): Promise<void> {
     if (NatsWrapper._client) {
       console.log("Already connected to NATS");
       return;
@@ -36,6 +34,10 @@ class NatsWrapper {
     });
 
     return new Promise<void>((resolve, reject) => {
+      if (!this._client) {
+        reject("NATS client not found");
+        return;
+      }
       this._client.on("connect", () => {
         console.log("Connected to NATS");
         resolve();
