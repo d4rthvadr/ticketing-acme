@@ -26,9 +26,16 @@ const setup = async (): Promise<{
     userId: new mongoose.Types.ObjectId().toHexString(),
   };
 
-  // @ts-ignore
   const msg: Message = {
     ack: jest.fn(),
+    getSubject: jest.fn(),
+    getSequence: jest.fn(),
+    getRawData: jest.fn(),
+    getData: jest.fn(),
+    isRedelivered: jest.fn(),
+    getCrc32: jest.fn(),
+    getTimestampRaw: jest.fn(),
+    getTimestamp: jest.fn(),
   };
 
   return { listener, data, msg };

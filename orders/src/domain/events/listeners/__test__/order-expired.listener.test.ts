@@ -1,23 +1,31 @@
-import NatsWrapper from "../../../../libs/nats-wrapper";
-import { ticketService } from "../../../services/ticket.service";
-import { TicketCreatedListener } from "../ticket-created.listener";
-import { TicketCreatedEvent } from "@vtex-tickets/common";
 import mongoose from "mongoose";
+import { ticketService } from "../../../../domain/services/ticket.service";
+import NatsWrapper from "../../../../libs/nats-wrapper";
+import { OrderExpiredListener } from "../order-expired.listener";
 import { Message } from "node-nats-streaming";
+import { orderService } from "../../../../domain/services/order.service";
+import { OrderExpiredEvent } from "@vtex-tickets/common";
 
 const setup = async (): Promise<{
-  listener: TicketCreatedListener;
+  listener: OrderExpiredListener;
   msg: Message;
-  data: TicketCreatedEvent["payload"];
+  data: OrderExpiredEvent["payload"];
 }> => {
-  const listener = new TicketCreatedListener(NatsWrapper.getClient());
+  const listener = new OrderExpiredListener(NatsWrapper.getClient());
 
-  const data: TicketCreatedEvent["payload"] = {
-    version: 0,
+  const ticket = await ticketService.createTicket({
     id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
+  });
+
+  const order = await orderService.createOrder({
+    ticketId: ticket.id,
     userId: new mongoose.Types.ObjectId().toHexString(),
+  });
+
+  const data: OrderExpiredEvent["payload"] = {
+    id: order.id,
   };
 
   const msg: Message = {
@@ -35,18 +43,13 @@ const setup = async (): Promise<{
   return { listener, data, msg };
 };
 
-it("should create and save a ticket", async () => {
+it("should update the order status to cancelled", async () => {
   const { listener, data, msg } = await setup();
 
   await listener.onMessage(data, msg);
 
-  expect(msg.ack).toHaveBeenCalled();
-
-  const ticket = await ticketService.findTicket(data.id);
-
-  expect(ticket).toBeDefined();
-  expect(ticket!.title).toEqual(data.title);
-  expect(ticket!.price).toEqual(data.price);
+  const order = await orderService.findById(data.id);
+  expect(order?.status).toEqual("cancelled");
 });
 
 it("should acknowledge the message", async () => {

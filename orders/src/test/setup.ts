@@ -3,19 +3,17 @@ import mongoose from "mongoose";
 import { signJwtToken } from "@vtex-tickets/common";
 import { randomBytes } from "crypto";
 
-declare global {
-  var signin: (userId?: string) => string[];
-}
-
 jest.mock("../libs/nats-wrapper", () => {
   return {
     __esModule: true,
     default: {
       getClient: () => {
         return {
-          publish: jest.fn().mockImplementation((subject: string, data: string, callback: () => void) => {
-            callback();
-          }),
+          publish: jest
+            .fn()
+            .mockImplementation((subject: string, data: string, callback: () => void) => {
+              callback();
+            }),
         };
       },
     },
@@ -25,8 +23,6 @@ jest.mock("../libs/nats-wrapper", () => {
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
-
-
   mongoServer = await MongoMemoryServer.create({});
   const mongoUri = mongoServer.getUri();
   await mongoose
@@ -61,7 +57,7 @@ global.signin = (userId: string | undefined) => {
     email: "email@example.com",
   };
 
-  const session = { jwt: signJwtToken(payload, process.env.JWT_SECRET ) };
+  const session = { jwt: signJwtToken(payload, process.env.JWT_SECRET) };
 
   const base64Format = Buffer.from(JSON.stringify(session)).toString("base64");
   return [`session=${base64Format}`];
