@@ -1,7 +1,15 @@
 import mongoose from "mongoose";
-import type { OrderAttributes } from '../interfaces/order.interface';
 import { OrderStatus } from "@vtex-tickets/common";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import { TicketAttributes } from "./ticket.model";
+
+interface OrderAttributes {
+  ticket: TicketAttributes;
+  expiresAt: Date;
+  status: OrderStatus;
+  userId: string;
+}
+
 export interface OrderDocument extends mongoose.Document, OrderAttributes {
   version: number;
 }
@@ -20,7 +28,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: OrderStatus.Created,
       required: true,
-      enum: Object.values(OrderStatus)
+      enum: Object.values(OrderStatus),
     },
     expiresAt: {
       type: Date,
@@ -29,7 +37,7 @@ const orderSchema = new mongoose.Schema(
     ticket: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Ticket",
-    }
+    },
   },
   {
     toJSON: {
@@ -39,7 +47,7 @@ const orderSchema = new mongoose.Schema(
       },
     },
     strict: true,
-  }
+  },
 );
 
 orderSchema.set("versionKey", "version");
@@ -50,6 +58,5 @@ orderSchema.statics.build = (att: OrderAttributes): OrderDocument => {
 };
 
 const Order = mongoose.model<OrderDocument, OrderModel>("Order", orderSchema);
-
 
 export { Order };

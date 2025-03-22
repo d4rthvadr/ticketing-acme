@@ -1,10 +1,6 @@
-import {
-  BaseListener,
-  Subjects,
-  TicketCreatedEvent,
-} from "@vtex-tickets/common";
+import { BaseListener, Subjects, TicketCreatedEvent } from "@vtex-tickets/common";
 import { Message } from "node-nats-streaming";
-import { queueGroupName } from "../queue-group-name";
+import { queueGroupName } from "./queue-group-name";
 import { ticketService } from "../../../domain/services/ticket.service";
 
 export class TicketCreatedListener extends BaseListener<TicketCreatedEvent> {
@@ -13,7 +9,6 @@ export class TicketCreatedListener extends BaseListener<TicketCreatedEvent> {
 
   async onMessage(data: TicketCreatedEvent["payload"], msg: Message) {
     try {
-
       const ticket = await ticketService.createTicket(data);
 
       console.log(`${this.subject} finished successfully!`, ticket);
