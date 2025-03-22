@@ -13,7 +13,7 @@ app.use(
   cookieSession({
     signed: false,
     secure: process.env.NODE_ENV === "dev" ? false : true,
-  })
+  }),
 );
 
 const routerPrefix = "/api/tickets";
@@ -24,10 +24,10 @@ app.get("/_status/healthz", (_req, res) => {
 
 app.use(`${routerPrefix}`, [ticketRoutes]);
 
-app.use(errorHandler);
-
 app.all("*", (_req: Request, _res: Response) => {
   throw new NotFoundError();
 });
+
+app.use(errorHandler);
 
 export { app };

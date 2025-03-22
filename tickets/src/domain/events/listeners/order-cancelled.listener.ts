@@ -1,6 +1,6 @@
 import { BaseListener, OrderCancelledEvent, Subjects } from "@vtex-tickets/common";
 import { Message } from "node-nats-streaming";
-import { queueGroupName } from "../queue-group-name";
+import { queueGroupName } from "./queue-group-name";
 import { ticketService } from "../../../domain/services/ticket.service";
 
 export class OrderCancelledListener extends BaseListener<OrderCancelledEvent> {

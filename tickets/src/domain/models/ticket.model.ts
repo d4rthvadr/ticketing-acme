@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
-import { TicketAttributes } from "../interfaces/ticket.interface";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+interface TicketAttributes {
+  title: string;
+  price: number;
+  userId: string;
+}
 
 export interface TicketDocument extends mongoose.Document, TicketAttributes {
   version: number;
