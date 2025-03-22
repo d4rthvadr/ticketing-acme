@@ -20,3 +20,18 @@ export const setUserAccountSeed = async (
     })
     .expect(201);
 };
+
+
+export const loginUser = async (
+  { email, password }: UserCredentials,
+  app: Express,
+) => {
+
+  return await request(app)
+  .post('/api/users/signin')
+  .send({
+    email,
+    password,
+  })
+  .expect(200);
+}

@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import { Password } from '../utils/password';
-import type { UserAttributes } from '../interfaces/user';
+
+export interface UserAttributes {
+  email: string;
+  password: string;
+  createdAt?: string;
+}
 
 export interface UserDocument extends mongoose.Document, UserAttributes {}
 

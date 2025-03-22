@@ -96,7 +96,9 @@ router.post(
         }, jwtSecret),
       };
 
-      return res.status(201).send({});
+      console.log('User signed in',  req.session);
+
+      return res.status(200).send({});
 
   },
 );

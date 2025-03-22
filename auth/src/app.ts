@@ -2,7 +2,7 @@ import express, { json, type Request, type Response } from 'express';
 import dotenv from 'dotenv';
 import { userRoutes, authRoutes } from './routes';
 import cookieSession from 'cookie-session';
-import { errorHandler } from '@vtex-tickets/common';
+import { errorHandler, NotFoundError } from '@vtex-tickets/common';
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ app.get('/_status/healthz', (_req, res) => {
 app.use(`${routerPrefix}`, [userRoutes, authRoutes]);
 
 app.all('*', (_req: Request, _res: Response) => {
-  throw new Error('Endpoint not found');
+  throw new NotFoundError();
 });
 
 app.use(errorHandler);

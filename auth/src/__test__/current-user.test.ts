@@ -1,7 +1,6 @@
 import request from 'supertest';
 import './helpers/env';
 import { UserCredentials } from './helpers/types';
-import { setUserAccountSeed } from './helpers/auth';
 import { app } from '../app';
 
 const userCredentials: UserCredentials = {
@@ -9,11 +8,12 @@ const userCredentials: UserCredentials = {
   password: 'password',
 };
 
-it('should respond with details about the current user', async () => {
-  const authResponse = await setUserAccountSeed(userCredentials, app);
-  const cookie = authResponse.get('Set-Cookie')!;
 
-  console.log(authResponse);
+it('should respond with details about the current user', async () => {
+
+  const cookie = await global.signin();
+  console.log("cookie: ", cookie);
+
   const response = await request(app)
     .get('/api/users/currentuser')
     .set('Cookie', cookie)
@@ -27,7 +27,8 @@ it('should respond null if not authenticated', async () => {
   const response = await request(app)
     .get('/api/users/currentuser')
     .send({})
-    .expect(400);
+    .expect(401);
 
-  expect(response.body?.currentUser?.email).toBeNull();
+
+  expect(response.body?.currentUser?.email).toBeUndefined();
 });

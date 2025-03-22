@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "start:dev": "nodemon src/index.ts",
     "start": "node dist/index.js",
-    "test": "jest --watchAll --no-cache",
+    "test": "JWT_SECRET=secret jest --watchAll --no-cache",
     "build": "tsc"
   },
   "jest": {
