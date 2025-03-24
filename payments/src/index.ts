@@ -4,9 +4,10 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import NatsWrapper from "./libs/nats-wrapper";
 import { randomBytes } from "crypto";
+import { initializeEventListeners } from "./domain/events/init-listeners";
 
 const PORT = process.env.NODE_PORT;
-process.env.JWT_SECRET = "SOME_SECRET";
+process.env.JWT_SECRET = "SOME_SECRET"; // TODO: pick from env instead
 let server: Server | undefined;
 
 /**
@@ -90,14 +91,15 @@ const connectNats = async (
 const onStart = async () => {
   const { DB_MONGO_URL, NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL } = getEnv();
 
-  const natsClientId =
-    NATS_CLIENT_ID ?? `client_${randomBytes(4).toString("hex")}`;
   try {
     // Nats connection
-    await connectNats(NATS_CLUSTER_ID, natsClientId, NATS_URL);
+    await connectNats(NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL);
 
     // MongoDB connection
     await connectDB(DB_MONGO_URL);
+
+    // Initialize event listeners
+    initializeEventListeners();
 
     server = app.listen(PORT, () => {
       console.log(`Listening on ${PORT}`);

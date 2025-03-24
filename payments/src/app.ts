@@ -2,6 +2,7 @@ import express, { json, type Request, type Response } from "express";
 import dotenv from "dotenv";
 import cookieSession from "cookie-session";
 import { errorHandler, NotFoundError } from "@vtex-tickets/common";
+import { chargeRoutes } from "./routes";
 
 dotenv.config();
 
@@ -15,18 +16,18 @@ app.use(
   })
 );
 
-const routerPrefix = "/api/tickets";
+const routerPrefix = "/api/payments";
 
 app.get("/_status/healthz", (_req, res) => {
   return res.status(200).send({});
 });
 
-app.use(`${routerPrefix}`, []);
-
-app.use(errorHandler);
+app.use(`${routerPrefix}`, [chargeRoutes]);
 
 app.all("*", (_req: Request, _res: Response) => {
   throw new NotFoundError();
 });
+
+app.use(errorHandler);
 
 export { app };
