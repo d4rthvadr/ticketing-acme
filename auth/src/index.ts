@@ -4,7 +4,7 @@ import { Server } from 'http';
 import mongoose from 'mongoose';
 
 const PORT = process.env.NODE_PORT;
-process.env.JWT_SECRET = 'SOME_SECRET';
+process.env.JWT_SECRET = 'SOME_SECRET'; // TODO: pick from env instead
 let server: Server | undefined;
 
 /**

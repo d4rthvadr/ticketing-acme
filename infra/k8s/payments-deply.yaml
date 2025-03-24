@@ -50,6 +50,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: STRIPE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-secret
+                  key: STRIPE_KEY
             # - name: JWT_SECRET
             #   valueFrom:
             #     secretKeyRef:
