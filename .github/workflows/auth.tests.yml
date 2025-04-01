@@ -3,14 +3,22 @@ name: auth-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "auth/**"
+
   pull_request:
     branches: ["main"]
+    paths:
+      - "auth/**"
 
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: auth
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,8 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: auth
 
       - name: Run tests
         run: npm run test:ci
-        working-directory: auth

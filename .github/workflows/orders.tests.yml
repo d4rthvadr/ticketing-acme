@@ -3,14 +3,22 @@ name: orders-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "orders/**"
+
   pull_request:
     branches: ["main"]
+    paths:
+      - "orders/**"
 
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: orders
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,8 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: orders
 
       - name: Run tests
         run: npm run test:ci
-        working-directory: orders
