@@ -9,6 +9,7 @@ interface PaymentAttributes {
 
 export interface PaymentDocument extends mongoose.Document, PaymentAttributes {
   version: number;
+  createdAt: Date;
 }
 
 export interface OrderModel extends mongoose.Model<PaymentDocument> {
@@ -39,6 +40,7 @@ const paymentSchema = new mongoose.Schema(
       },
     },
     strict: true,
+    timestamps: true,
   }
 );
 

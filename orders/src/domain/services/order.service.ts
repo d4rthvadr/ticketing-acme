@@ -11,6 +11,7 @@ import {
   OrderStatus,
 } from "@vtex-tickets/common";
 import { ticketService } from "./ticket.service";
+import { UpdateOrderDto } from "./dto/update-order.dto";
 
 const EXPIRATION_WINDOW_SECONDS = 15 * 60;
 
@@ -29,11 +30,11 @@ export class OrderService {
    * @throws {BadRequestError} - If the ticket is already reserved.
    *
    */
-  async createOrder(createOrderDto: CreateOrderDto): Promise<any> {
+  async create(createOrderDto: CreateOrderDto): Promise<any> {
     const { userId, ticketId } = createOrderDto;
 
     // Get associated ticket
-    const ticket: TicketDocument = await ticketService.findTicket(ticketId);
+    const ticket: TicketDocument = await ticketService.findById(ticketId);
 
     try {
       const isReserved: boolean = await this.isTicketReserved(ticket);
@@ -117,19 +118,52 @@ export class OrderService {
     return order;
   }
 
+  $where: {
+    status: OrderStatus.Created;
+  };
   async list(userId: string): Promise<OrderDocument[]> {
     const orders: OrderDocument[] = await this.orderModel
       .find({
         userId,
+        status: {
+          $in: [OrderStatus.Created, OrderStatus.Complete],
+        },
       })
+      .sort({ createdAt: -1 })
       .populate("ticket");
 
     return orders;
   }
 
-  async cancel(orderId: string, userId?: string): Promise<OrderDocument> {
+  /**
+   * Updates an existing order with the provided data.
+   *
+   * @param {UpdateOrderDto} updateOrderData - The data to update the order with.
+   * @returns {Promise<OrderDocument>} - A promise that resolves to the updated order document.
+   * @throws Will throw an error if the order update fails.
+   */
+  async update(updateOrderData: UpdateOrderDto): Promise<OrderDocument> {
+    try {
+      const order: OrderDocument = await this.findById(updateOrderData.orderId);
+
+      order.set({
+        status: updateOrderData.status,
+      });
+
+      return await order.save();
+    } catch (err) {
+      console.error("Error updating order", err);
+      throw err;
+    }
+  }
+
+  async cancel(orderId: string, userId?: string): Promise<OrderDocument | undefined> {
     try {
       const order: OrderDocument = await this.findById(orderId, userId);
+
+      if ([OrderStatus.Complete, OrderStatus.Cancelled].includes(order.status)) {
+        throw new BadRequestError("Order already cancelled or completed");
+      }
 
       order.status = OrderStatus.Cancelled;
       await order.save();

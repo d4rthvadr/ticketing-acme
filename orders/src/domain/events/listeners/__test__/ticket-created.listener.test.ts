@@ -42,7 +42,7 @@ it("should create and save a ticket", async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 
-  const ticket = await ticketService.findTicket(data.id);
+  const ticket = await ticketService.findById(data.id);
 
   expect(ticket).toBeDefined();
   expect(ticket!.title).toEqual(data.title);

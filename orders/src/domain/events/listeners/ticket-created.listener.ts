@@ -9,14 +9,13 @@ export class TicketCreatedListener extends BaseListener<TicketCreatedEvent> {
 
   async onMessage(data: TicketCreatedEvent["payload"], msg: Message) {
     try {
-      const ticket = await ticketService.createTicket(data);
+      const ticket = await ticketService.create(data);
 
       console.log(`${this.subject} finished successfully!`, ticket);
 
       msg.ack();
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

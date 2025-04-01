@@ -27,8 +27,7 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
 
       console.log(`${this.subject} finished successfully!`, `Order ID: ${orderId}`);
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

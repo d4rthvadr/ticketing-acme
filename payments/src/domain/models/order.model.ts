@@ -12,6 +12,7 @@ interface OrderAttributes {
 
 export interface OrderDocument extends mongoose.Document, OrderAttributes {
   version: number;
+  createdAt: Date;
 }
 
 export interface OrderModel extends mongoose.Model<OrderDocument> {
@@ -43,6 +44,7 @@ const orderSchema = new mongoose.Schema(
       },
     },
     strict: true,
+    timestamps: true,
   }
 );
 

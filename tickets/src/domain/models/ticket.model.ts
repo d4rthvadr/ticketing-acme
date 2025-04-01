@@ -9,6 +9,7 @@ interface TicketAttributes {
 export interface TicketDocument extends mongoose.Document, TicketAttributes {
   version: number;
   orderId?: string;
+  createdAt: Date;
 }
 
 export interface TicketModel extends mongoose.Model<TicketDocument> {
@@ -41,6 +42,7 @@ const ticketSchema = new mongoose.Schema(
       },
     },
     strict: true,
+    timestamps: true,
   },
 );
 

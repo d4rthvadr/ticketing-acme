@@ -16,14 +16,13 @@ export class TicketUpdatedListener extends BaseListener<TicketUpdatedEvent> {
     console.log("Event data!", data);
 
     try {
-      const updatedTicket = await ticketService.updateTicket(data);
+      const updatedTicket = await ticketService.update(data);
 
       console.log(`${this.subject} finished successfully!`, updatedTicket);
 
       msg.ack();
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

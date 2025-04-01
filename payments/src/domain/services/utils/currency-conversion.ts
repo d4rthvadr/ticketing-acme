@@ -10,16 +10,14 @@ class CurrencyConversionError extends Error {
   }
 }
 
-const convertToCents = (amount: number): number => Math.round(amount * 100);
 /**
- * Converts the given amount to the specified currency.
+ * Converts a monetary amount to its value in cents.
  *
- * @param amount - The amount to be converted.
- * @param to - The target currency to convert the amount to.
- * @returns The converted amount in the target currency.
- * @throws Will throw an error if the specified currency is unsupported.
+ * @param amount - The monetary amount to convert, which can be a number or a string.
+ * @returns The equivalent value in cents as a number.
+ * @throws {CurrencyConversionError} If the provided amount is invalid (e.g., not a number or negative).
  */
-const convertAmountTo = (amount: number | string, to: Currencies): number => {
+const convertToCents = (amount: number | string): number => {
   if (typeof amount !== "number") {
     amount = parseFloat(amount);
   }
@@ -28,12 +26,7 @@ const convertAmountTo = (amount: number | string, to: Currencies): number => {
     throw new CurrencyConversionError(`Invalid amount of ${amount}`);
   }
 
-  switch (to) {
-    case Currencies.USD:
-      return convertToCents(amount);
-    default:
-      throw new CurrencyConversionError(`Unsupported currency: ${to}`);
-  }
+  return Math.round(amount * 100);
 };
 
-export { convertAmountTo, Currencies, CurrencyConversionError };
+export { Currencies, CurrencyConversionError, convertToCents };

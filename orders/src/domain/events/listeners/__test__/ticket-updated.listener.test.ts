@@ -12,7 +12,7 @@ const setup = async (): Promise<{
 }> => {
   const listener = new TicketUpdatedListener(NatsWrapper.getClient());
 
-  const ticket = await ticketService.createTicket({
+  const ticket = await ticketService.create({
     id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
@@ -46,7 +46,7 @@ it("should create and update a ticket", async () => {
 
   await listener.onMessage(data, msg);
 
-  const ticket = await ticketService.findTicket(data.id);
+  const ticket = await ticketService.findById(data.id);
 
   expect(ticket).toBeDefined();
   expect(ticket!.title).toEqual(data.title);

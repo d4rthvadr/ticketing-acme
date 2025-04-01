@@ -13,9 +13,9 @@ const mockUserId = new mongoose.Types.ObjectId().toHexString();
 
 const createOrderHelper = async (
   userId: string,
-  status?: OrderStatus
+  status?: OrderStatus,
 ): Promise<{ ticketId: any; order: OrderDocument }> => {
-  // TODO: User orderService.createTicket({..})
+  // TODO: User orderService.create({..})
   const ticket: TicketDocument = Ticket.build({
     ticketId: new mongoose.Types.ObjectId().toHexString(),
     title: "Sam's concert",
@@ -46,10 +46,7 @@ describe("Orders controller", () => {
 
   describe("Create order", () => {
     it("should return an error if the ticket does not exits", async () => {
-      const response = await request(app)
-        .post("/api/orders")
-        .set("Cookie", cookie)
-        .send({});
+      const response = await request(app).post("/api/orders").set("Cookie", cookie).send({});
 
       expect(response.status).toEqual(400);
     });
@@ -57,28 +54,19 @@ describe("Orders controller", () => {
     it("should return an error if ticket is already reserved", async () => {
       const { ticketId } = await createOrderHelper(mockUserId);
 
-      const response = await request(app)
-        .post("/api/orders")
-        .set("Cookie", cookie)
-        .send({
-          ticketId,
-        });
+      const response = await request(app).post("/api/orders").set("Cookie", cookie).send({
+        ticketId,
+      });
 
       expect(response.status).toEqual(400);
     });
 
     it("should reserve a ticket", async () => {
-      const { ticketId } = await createOrderHelper(
-        mockUserId,
-        OrderStatus.Cancelled
-      );
+      const { ticketId } = await createOrderHelper(mockUserId, OrderStatus.Cancelled);
 
-      const response = await request(app)
-        .post("/api/orders")
-        .set("Cookie", cookie)
-        .send({
-          ticketId,
-        });
+      const response = await request(app).post("/api/orders").set("Cookie", cookie).send({
+        ticketId,
+      });
 
       expect(response.status).toEqual(201);
     });
@@ -88,10 +76,7 @@ describe("Orders controller", () => {
     it("should a list of orders", async () => {
       const { order } = await createOrderHelper(mockUserId);
 
-      const response = await request(app)
-        .get("/api/orders")
-        .set("Cookie", cookie)
-        .send({});
+      const response = await request(app).get("/api/orders").set("Cookie", cookie).send({});
 
       expect(response.status).toEqual(200);
       expect(response.body[0].id).toEqual(order.id);
@@ -122,9 +107,7 @@ describe("Orders controller", () => {
     });
 
     it("should return 401 if ticket does not belong to user", async () => {
-      const { order } = await createOrderHelper(
-        new mongoose.Types.ObjectId().toHexString()
-      );
+      const { order } = await createOrderHelper(new mongoose.Types.ObjectId().toHexString());
 
       const cookie = await global.signin();
 
@@ -140,9 +123,7 @@ describe("Orders controller", () => {
   describe("Cancel order", () => {
     it("should return 404 if order is not found", async () => {
       const response = await request(app)
-        .patch(
-          `/api/orders/${new mongoose.Types.ObjectId().toHexString()}/cancel`
-        )
+        .patch(`/api/orders/${new mongoose.Types.ObjectId().toHexString()}/cancel`)
         .set("Cookie", cookie)
         .send({});
 
@@ -150,9 +131,7 @@ describe("Orders controller", () => {
     });
 
     it("should return 401 if ticket does not belong to user", async () => {
-      const { order } = await createOrderHelper(
-        new mongoose.Types.ObjectId().toHexString()
-      );
+      const { order } = await createOrderHelper(new mongoose.Types.ObjectId().toHexString());
 
       const cookie = await global.signin();
 
@@ -178,9 +157,7 @@ describe("Orders controller", () => {
       expect(NatsWrapper.getClient().publish).toHaveBeenCalled();
     });
 
-
     it("should fail to cancel an order", async () => {
-
       const response = await request(app)
         .patch(`/api/orders/${ticketId}/cancel`)
         .set("Cookie", cookie)

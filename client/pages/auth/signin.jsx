@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Router from "next/router";
 import useRequest from "../../hooks/use-request";
+import ErrorAlert from "../../components/error-alert";
 
 export default () => {
   const [email, setEmail] = useState("");
@@ -16,59 +17,45 @@ export default () => {
     onSuccess: () => Router.push("/"),
   });
 
-
   const onSubmit = async (ev) => {
     ev.preventDefault();
 
     await doRequest();
-
   };
 
   return (
-    <div className="container">
-      <div
-        className="card"
-        style={{ width: "38rem", margin: "0 auto", marginTop: "50px" }}
-      >
-        <div className="card-body">
-          <form onSubmit={onSubmit}>
-            <h1>Sign In</h1>
+    <div
+      className="card"
+      style={{ width: "38rem", margin: "0 auto", marginTop: "50px" }}
+    >
+      <div className="card-body">
+        <form onSubmit={onSubmit}>
+          <h1>Sign In</h1>
 
-            {errors?.length > 0 && 
-            
-            (
-              <div className="alert alert-danger">
-                <ul className="my-0">
-                  {errors.map((err, i) => (
-                    <li key={err+i}>{err}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            <div className="form-group">
-              <label>Email Address</label>
-              <input
-                required
-                className="form-control"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                required
-                type="password"
-                className="form-control"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <button className="btn btn-primary mt-3">Sign In</button>
-          </form>
-        </div>
+          <ErrorAlert errors={errors} />
+
+          <div className="form-group">
+            <label>Email Address</label>
+            <input
+              required
+              className="form-control"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              required
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button className="btn btn-primary mt-3">Sign In</button>
+        </form>
       </div>
     </div>
   );

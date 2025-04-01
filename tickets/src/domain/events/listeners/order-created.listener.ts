@@ -1,7 +1,7 @@
 import { BaseListener, OrderCreatedEvent, Subjects } from "@vtex-tickets/common";
 import { Message } from "node-nats-streaming";
 import { queueGroupName } from "./queue-group-name";
-import { ticketService } from "../../../domain/services/ticket.service";
+import { adminTicketService } from "../../../domain/services/admin.ticket.service";
 
 export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
   readonly subject: Subjects.OrderCreated = Subjects.OrderCreated;
@@ -14,14 +14,13 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
         ticket: { id: ticketId },
       } = data;
 
-      const reserveTicket = await ticketService.reserveTicket(ticketId, id);
+      const reserveTicket = await adminTicketService.reserve(ticketId, id);
 
       console.log(`${this.subject} finished successfully!`, reserveTicket);
 
       msg.ack();
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

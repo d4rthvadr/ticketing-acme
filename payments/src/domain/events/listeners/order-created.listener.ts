@@ -16,7 +16,7 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
     msg: Message
   ): Promise<void> {
     try {
-      const order = await orderService.createOrder({
+      const order = await orderService.create({
         ...data,
         price: data.ticket.price,
       });
@@ -25,8 +25,7 @@ export class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
 
       msg.ack();
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

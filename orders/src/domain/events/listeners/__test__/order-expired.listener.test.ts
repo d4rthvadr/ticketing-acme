@@ -13,13 +13,13 @@ const setup = async (): Promise<{
 }> => {
   const listener = new OrderExpiredListener(NatsWrapper.getClient());
 
-  const ticket = await ticketService.createTicket({
+  const ticket = await ticketService.create({
     id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });
 
-  const order = await orderService.createOrder({
+  const order = await orderService.create({
     ticketId: ticket.id,
     userId: new mongoose.Types.ObjectId().toHexString(),
   });

@@ -8,8 +8,7 @@ import { OrderCreatedListener } from "./listeners/order-created.listener";
  * for events using the NATS client.
  *
  * The following listeners are initialized:
- * - TicketCreatedListener
- * - TicketUpdatedListener
+ * - OrderCreatedListener
  *
  * @returns {void}
  */

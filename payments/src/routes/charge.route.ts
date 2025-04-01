@@ -22,15 +22,13 @@ router.post(
   ],
   validateRequest,
   asyncHandler(async (req: Request, res: Response) => {
-    await orderService.charge({
+    const payment = await orderService.charge({
       orderId: req.params.orderId,
       token: req.body.token,
       userId: req.user!.id,
     });
 
-    return res.status(201).send({
-      message: "Charge created",
-    });
+    return res.status(201).send(payment);
   })
 );
 

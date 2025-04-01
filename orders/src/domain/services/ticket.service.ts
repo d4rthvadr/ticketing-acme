@@ -1,9 +1,5 @@
 import { NotFoundError } from "@vtex-tickets/common";
-import {
-  Ticket,
-  TicketDocument,
-  TicketModel,
-} from "../../domain/models/ticket.model";
+import { Ticket, TicketDocument, TicketModel } from "../../domain/models/ticket.model";
 import { CreateTicketDto } from "./dto/create-ticket.dto";
 import { UpdateTicketDto } from "./dto/update-ticket.dto";
 
@@ -22,17 +18,14 @@ export class TicketService {
    * @returns A promise that resolves to the found ticket document.
    * @throws NotFoundError - If no ticket is found with the given ID (and version, if provided).
    */
-  async findTicket(
-    ticketId: string,
-    version?: number
-  ): Promise<TicketDocument> {
+  async findById(ticketId: string, version?: number): Promise<TicketDocument> {
     const ticket: TicketDocument | null = await this.ticketModel.findOne({
       _id: ticketId,
       ...(version && { version: version - 1 }), // if version is provided, add it to the query
     });
 
     if (!ticket) {
-      console.error("Ticket not found", {version, ticketId});
+      console.error("Ticket not found", { version, ticketId });
 
       throw new NotFoundError("Ticket not found");
     }
@@ -49,24 +42,18 @@ export class TicketService {
    * @param {number} param0.price - The price of the ticket.
    * @returns {Promise<TicketDocument>} - A promise that resolves to the created ticket document.
    */
-  async createTicket({
-    id,
-    title,
-    price,
-  }: CreateTicketDto): Promise<TicketDocument> {
-
-    try{
-
+  async create({ id, title, price }: CreateTicketDto): Promise<TicketDocument> {
+    try {
       const ticket: TicketDocument = this.ticketModel.build({
         ticketId: id,
         title,
         price,
       });
-  
+
       await ticket.save();
-  
+
       return ticket;
-    }catch(err){
+    } catch (err) {
       console.error("Error creating ticket", err);
       throw err;
     }
@@ -82,14 +69,9 @@ export class TicketService {
    * @returns {Promise<TicketDocument>} - A promise that resolves to the updated ticket document.
    * @throws {Error} - Throws an error if the ticket cannot be found or if the update fails.
    */
-  async updateTicket({
-    id,
-    title,
-    price,
-    version,
-  }: UpdateTicketDto): Promise<TicketDocument> {
+  async update({ id, title, price, version }: UpdateTicketDto): Promise<TicketDocument> {
     try {
-      const ticket: TicketDocument = await this.findTicket(id, version);
+      const ticket: TicketDocument = await this.findById(id, version);
 
       ticket.title = title;
       ticket.price = price;

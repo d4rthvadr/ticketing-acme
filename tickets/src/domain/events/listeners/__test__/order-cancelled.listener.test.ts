@@ -3,7 +3,7 @@ import { OrderCancelledEvent } from "@vtex-tickets/common";
 import NatsWrapper from "../../../../libs/nats-wrapper";
 import { OrderCancelledListener } from "../order-cancelled.listener";
 import mongoose from "mongoose";
-import { ticketService } from "../../../../domain/services/ticket.service";
+import { adminTicketService } from "../../../../domain/services/admin.ticket.service";
 import { CreateTicketDto } from "../../../../domain/services/dto/create-ticket.dto";
 import { Message } from "node-nats-streaming";
 
@@ -18,7 +18,7 @@ const setUp = async (): Promise<{
     userId: new mongoose.Types.ObjectId().toHexString(),
   };
 
-  const ticket = await ticketService.createTicket(ticketData);
+  const ticket = await adminTicketService.create(ticketData);
 
   const listener = new OrderCancelledListener(NatsWrapper.getClient());
 
@@ -51,7 +51,7 @@ it("should set the orderId to undefined of the ticket", async () => {
 
   await listener.onMessage(data, msg);
 
-  const ticket = await ticketService.findById(data.ticket.id);
+  const ticket = await adminTicketService.findById(data.ticket.id);
 
   expect(ticket).toBeDefined();
   expect(ticket.orderId).toBeUndefined();
@@ -64,4 +64,3 @@ it("should acknowledge the message", async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 });
-

@@ -16,8 +16,7 @@ export class OrderExpiredListener extends BaseListener<OrderExpiredEvent> {
 
       msg.ack();
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.log(`[${this.subject}] listener failed`, err);
     }
   }
 }

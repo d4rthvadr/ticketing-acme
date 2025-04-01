@@ -43,7 +43,7 @@ router.post(
   ],
   validateRequest,
   asyncHandler(async (req: Request, res: Response) => {
-    const order: OrderDocument = await orderService.createOrder({
+    const order: OrderDocument = await orderService.create({
       userId: req.user!.id,
       ticketId: req.body.ticketId,
     });

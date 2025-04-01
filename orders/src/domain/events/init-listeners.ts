@@ -2,6 +2,7 @@ import { TicketCreatedListener } from "./listeners/ticket-created.listener";
 import { TicketUpdatedListener } from "./listeners/ticket-updated.listener";
 import NatsWrapper from "../../libs/nats-wrapper";
 import { OrderExpiredListener } from "./listeners/order-expired.listener";
+import { PaymentCreatedListener } from "./listeners/payment-created.listener";
 
 /**
  * Initializes event listeners for the application.
@@ -13,11 +14,12 @@ import { OrderExpiredListener } from "./listeners/order-expired.listener";
  * - TicketCreatedListener
  * - TicketUpdatedListener
  * - OrderExpiredListener
+ * - PaymentCreatedListener
  *
  * @returns {void}
  */
 export const initializeEventListeners = () => {
-  [TicketCreatedListener, TicketUpdatedListener, OrderExpiredListener].map((listener) =>
-    new listener(NatsWrapper.getClient()).listen(),
+  [TicketCreatedListener, TicketUpdatedListener, OrderExpiredListener, PaymentCreatedListener].map(
+    (listener) => new listener(NatsWrapper.getClient()).listen(),
   );
 };

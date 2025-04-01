@@ -13,9 +13,11 @@ import {
   NotFoundError,
   OrderStatus,
 } from "@vtex-tickets/common";
-import { convertAmountTo, Currencies } from "./utils/currency-conversion";
-import { Payment } from "../../domain/models/payment.model";
-import { PaymentProvider } from "domain/enums/payment-providers.enum";
+import { convertToCents, Currencies } from "./utils/currency-conversion";
+import { Payment, PaymentDocument } from "../../domain/models/payment.model";
+import { PaymentProvider } from "../../domain/enums/payment-providers.enum";
+import { PaymentCreatedPublisher } from "../../domain/events/publishers/payment-created.publisher";
+import NatsWrapper from "../../libs/nats-wrapper";
 
 export class OrderService {
   private orderModel: OrderModel;
@@ -32,7 +34,7 @@ export class OrderService {
    * @throws {BadRequestError} - If the ticket is already reserved.
    *
    */
-  async createOrder(createOrderDto: CreateOrderDto): Promise<OrderDocument> {
+  async create(createOrderDto: CreateOrderDto): Promise<OrderDocument> {
     const { id: orderId, userId, status, price, version } = createOrderDto;
 
     try {
@@ -104,7 +106,7 @@ export class OrderService {
     }
   }
 
-  async charge(dataDto: ChargeOrderDto): Promise<OrderDocument> {
+  async charge(dataDto: ChargeOrderDto): Promise<PaymentDocument> {
     try {
       const { orderId, userId, token } = dataDto;
       const order: OrderDocument = await this.findById(orderId);
@@ -115,8 +117,12 @@ export class OrderService {
         throw new BadRequestError("Cannot pay for a cancelled order.");
       }
 
+      if (order.status === OrderStatus.Complete) {
+        throw new BadRequestError("Order already completed.");
+      }
+
       const stripeResult = await stripe.charges.create({
-        amount: convertAmountTo(order.price, Currencies.USD),
+        amount: convertToCents(order.price),
         currency: Currencies.USD,
         source: token,
         description: `Charge for order ${orderId}`,
@@ -130,9 +136,18 @@ export class OrderService {
 
       await payment.save();
 
+      await new PaymentCreatedPublisher(NatsWrapper.getClient()).publish({
+        payload: {
+          id: payment.id,
+          orderId: payment.orderId,
+          paymentRefId: payment.paymentRefId,
+          paymentProvider: payment.paymentProvider,
+        },
+      });
+
       console.log("Stripe charge result", stripeResult);
 
-      return order;
+      return payment;
     } catch (err) {
       console.error("Error charging order", err);
       throw err;
