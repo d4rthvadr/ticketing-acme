@@ -32,31 +32,32 @@ router.post(
     if (existingUser) {
       console.log('User already exists');
       // TODO: use actual logger instead
-      return res.status(400).send({errors: ['User already exists']});
+      return res.status(400).send({ errors: ['User already exists'] });
     }
 
-      const user: UserDocument = User.build({
-        email,
-        password,
-      });
+    const user: UserDocument = User.build({
+      email,
+      password,
+    });
 
-      await user.save();
+    await user.save();
 
-      const userJwt = signJwtToken({
+    const userJwt = signJwtToken(
+      {
         id: user?._id?.toString(),
         email: user.email,
-      }, jwtSecret);
- 
-      req.session = {
-        ...req.session,
-        jwt: userJwt,
-      };
+      },
+      jwtSecret,
+    );
 
-      return res.status(201).send({ user });
+    req.session = {
+      ...req.session,
+      jwt: userJwt,
+    };
 
+    return res.status(201).send({ user });
   },
 );
-
 
 // /api/users/signin
 router.post(
@@ -67,39 +68,43 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-      const { email, password } = req.body;
+    const { email, password } = req.body;
 
-      const existingUser: UserDocument = await getUser({
-        email,
-      });
+    const existingUser: UserDocument = await getUser({
+      email,
+    });
 
-      if (!existingUser) {
-        return res.status(400).send({errors: ['Account not found or invalid credentials']});
-      }
+    if (!existingUser) {
+      return res
+        .status(400)
+        .send({ message: 'Account not found or invalid credentials' });
+    }
 
-      // TODO: fix hashing issue with password
+    // TODO: fix hashing issue with password
 
-      // const passwordMatch = await Password.compare(
-      //   password,
-      //   existingUser.password,
-      // );
+    // const passwordMatch = await Password.compare(
+    //   password,
+    //   existingUser.password,
+    // );
 
-      // if (!passwordMatch) {
-      //   return res.status(400).send({errors: ['Account not found or invalid credentials']});
-      // }
+    // if (!passwordMatch) {
+    //   return res.status(400).send({errors: ['Account not found or invalid credentials']});
+    // }
 
-      req.session = {
-        ...req.session,
-        jwt: signJwtToken({
+    req.session = {
+      ...req.session,
+      jwt: signJwtToken(
+        {
           id: existingUser?._id?.toString(),
           email: existingUser.email,
-        }, jwtSecret),
-      };
+        },
+        jwtSecret,
+      ),
+    };
 
-      console.log('User signed in',  req.session);
+    console.log('User signed in', req.session);
 
-      return res.status(200).send({});
-
+    return res.status(200).send({});
   },
 );
 
