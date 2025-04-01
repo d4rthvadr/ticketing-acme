@@ -78,6 +78,7 @@ const connectDB = async (mongoDbUrl: string) => {
  */
 const onStart = async () => {
   const { DB_MONGO_URL } = getEnv();
+
   try {
     await connectDB(DB_MONGO_URL);
     server = app.listen(PORT, () => {

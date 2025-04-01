@@ -3,8 +3,13 @@ name: auth-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "auth/**"
+
   pull_request:
     branches: ["main"]
+    paths:
+      - "auth/**"
 
   workflow_dispatch:
 

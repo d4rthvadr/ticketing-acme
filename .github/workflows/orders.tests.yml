@@ -3,8 +3,13 @@ name: orders-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "orders/**"
+
   pull_request:
     branches: ["main"]
+    paths:
+      - "orders/**"
 
   workflow_dispatch:
 

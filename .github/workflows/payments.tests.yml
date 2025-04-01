@@ -3,8 +3,13 @@ name: payments-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "payments/**"
+
   pull_request:
     branches: ["main"]
+    paths:
+      - "payments/**"
 
   workflow_dispatch:
 

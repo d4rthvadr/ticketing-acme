@@ -3,8 +3,12 @@ name: tickets-tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "tickets/**"
   pull_request:
     branches: ["main"]
+    paths:
+      - "tickets/**"
 
   workflow_dispatch:
 
