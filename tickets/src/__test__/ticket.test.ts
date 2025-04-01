@@ -9,7 +9,7 @@ setUpEnv();
 
 const createTicketHelper = async (title: string, price: number, cookie: string[]) => {
   // create a ticket
-  return await request(app).post("/api/tickets").set("Cookie", cookie).send({
+  return await request(app).post("/api/tickets/admin").set("Cookie", cookie).send({
     title,
     price,
   });
@@ -26,23 +26,23 @@ describe("Tickets controller", () => {
   });
 
   describe("Create tickets", () => {
-    it("should have a handler listening to /api/tickets for post requests", async () => {
-      const response = await request(app).post("/api/tickets").send({});
+    it("should have a handler listening to /api/tickets/admin for post requests", async () => {
+      const response = await request(app).post("/api/tickets/admin").send({});
       expect(response.status).not.toEqual(404);
     });
 
     it("should return 401 if user is not signed in", async () => {
-      await request(app).post("/api/tickets").send({}).expect(401);
+      await request(app).post("/api/tickets/admin").send({}).expect(401);
     });
 
     it("should not return 401 if user is signed in", async () => {
-      const response = await request(app).post("/api/tickets").set("Cookie", cookie).send({});
+      const response = await request(app).post("/api/tickets/admin").set("Cookie", cookie).send({});
       expect(response.status).not.toEqual(401);
     });
 
     it("should return an error if an invalid title is provided", async () => {
       const response = await request(app)
-        .post("/api/tickets")
+        .post("/api/tickets/admin")
         .set("Cookie", cookie)
         .send({ tile: "" });
       expect(response.status).toEqual(400);
@@ -50,7 +50,7 @@ describe("Tickets controller", () => {
 
     it("should return an error if an invalid price is provided", async () => {
       await request(app)
-        .post("/api/tickets")
+        .post("/api/tickets/admin")
         .send({ price: 200 })
         .set("Cookie", cookie)
         .expect(400);
@@ -61,7 +61,7 @@ describe("Tickets controller", () => {
       expect(tickets.length).toEqual(0);
 
       await request(app)
-        .post("/api/tickets")
+        .post("/api/tickets/admin")
         .set("Cookie", cookie)
         .send({
           title,
@@ -78,7 +78,7 @@ describe("Tickets controller", () => {
   describe("Find tickets", () => {
     it.skip("should return 404 if ticket is not found", async () => {
       const response = await request(app)
-        .get(`/api/tickets/${ticketId}`)
+        .get(`/api/tickets/admin/${ticketId}`)
         .set("Cookie", cookie)
         .send({});
 
@@ -89,7 +89,7 @@ describe("Tickets controller", () => {
       let response = await createTicketHelper(title, price, cookie);
 
       response = await request(app)
-        .get(`/api/tickets/${response.body.id}`)
+        .get(`/api/tickets/admin/${response.body.id}`)
         .set("Cookie", cookie)
         .send({});
       expect(response.status).toEqual(200);
@@ -103,7 +103,7 @@ describe("Tickets controller", () => {
       // create a ticket
       await createTicketHelper(title, price, cookie);
 
-      const response = await request(app).get(`/api/tickets`).set("Cookie", cookie).send({});
+      const response = await request(app).get(`/api/tickets/admin`).set("Cookie", cookie).send({});
 
       expect(response.status).toEqual(200);
       expect(response.body.length).toEqual(1);
@@ -116,7 +116,7 @@ describe("Tickets controller", () => {
       await createTicketHelper(title, price, cookie);
 
       const response = await request(app)
-        .put(`/api/tickets/${ticketId}`)
+        .put(`/api/tickets/admin/${ticketId}`)
         .set("Cookie", cookie)
         .send({
           title,
@@ -131,7 +131,7 @@ describe("Tickets controller", () => {
       // create a ticket
       await createTicketHelper(title, price, cookie);
 
-      const response = await request(app).put(`/api/tickets/${ticketId}`).send({});
+      const response = await request(app).put(`/api/tickets/admin/${ticketId}`).send({});
 
       expect(response.status).toEqual(401);
     });
@@ -143,7 +143,7 @@ describe("Tickets controller", () => {
       const newCookie = await global.signin(crypto.randomUUID());
 
       await request(app)
-        .put(`/api/tickets/${response.body.id}`)
+        .put(`/api/tickets/admin/${response.body.id}`)
         .set("Cookie", newCookie)
         .send({
           title: "new title",
@@ -157,7 +157,7 @@ describe("Tickets controller", () => {
       const response = await createTicketHelper(title, price, cookie);
 
       await request(app)
-        .put(`/api/tickets/${response.body.id}`)
+        .put(`/api/tickets/admin/${response.body.id}`)
         .set("Cookie", cookie)
         .send({
           title: "new title",
@@ -177,7 +177,7 @@ describe("Tickets controller", () => {
     //   await ticket!.save();
 
     //   response = await request(app)
-    //     .put(`/api/tickets/${response.body.id}`)
+    //     .put(`/api/tickets/admin${response.body.id}`)
     //     .set("Cookie", cookie)
     //     .send({
     //       title: "new title",

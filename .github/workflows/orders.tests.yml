@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Chekout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js

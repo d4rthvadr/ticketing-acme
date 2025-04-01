@@ -158,8 +158,10 @@ describe("Orders controller", () => {
     });
 
     it("should fail to cancel an order", async () => {
+      const { order } = await createOrderHelper(mockUserId);
+
       const response = await request(app)
-        .patch(`/api/orders/${ticketId}/cancel`)
+        .patch(`/api/orders/${order.id}/cancel`)
         .set("Cookie", cookie)
         .send({});
 
