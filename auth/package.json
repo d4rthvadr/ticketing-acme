@@ -12,8 +12,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start:dev": "nodemon src/index.ts",
     "start": "node dist/index.js",
-    "test": "JWT_SECRET=secret jest --watchAll --no-cache",
-    "test:ci": "JWT_SECRET=secret jest --no-cache",
+    "test": "JWT_SECRET=secret NODE_ENV=dev jest --watchAll --no-cache",
+    "test:ci": "JWT_SECRET=secret NODE_ENV=dev jest --no-cache",
     "build": "tsc"
   },
   "jest": {
@@ -21,6 +21,10 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
     ],
     "testTimeout": 60000
   },

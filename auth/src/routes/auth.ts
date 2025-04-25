@@ -55,6 +55,8 @@ router.post(
       jwt: userJwt,
     };
 
+    console.log('User signed up', req.session);
+
     return res.status(201).send({ user });
   },
 );

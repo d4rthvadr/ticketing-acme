@@ -8,11 +8,11 @@ const userCredentials: UserCredentials = {
   password: 'password',
 };
 
-
 it('should respond with details about the current user', async () => {
-
-  const cookie = await global.signin();
-  console.log("cookie: ", cookie);
+  const cookie = await global.signin(
+    userCredentials.email,
+    userCredentials.password,
+  );
 
   const response = await request(app)
     .get('/api/users/currentuser')
@@ -28,7 +28,6 @@ it('should respond null if not authenticated', async () => {
     .get('/api/users/currentuser')
     .send({})
     .expect(401);
-
 
   expect(response.body?.currentUser?.email).toBeUndefined();
 });
