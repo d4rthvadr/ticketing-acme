@@ -13,7 +13,6 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "start:dev": "nodemon src/index.ts",
     "start": "node dist/index.js",
-    "test": "JWT_SECRET=secret jest --watchAll --no-cache",
     "build": "tsc"
   },
   "jest": {
