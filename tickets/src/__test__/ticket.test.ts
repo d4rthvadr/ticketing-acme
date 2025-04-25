@@ -3,7 +3,7 @@ import { app } from "../app";
 import { setUpEnv } from "./helpers/env";
 import { Ticket } from "../domain/models/ticket.model";
 import mongoose from "mongoose";
-import NatsWrapper from "../../src/libs/nats-wrapper";
+import crypto from "crypto";
 
 setUpEnv();
 
@@ -76,7 +76,7 @@ describe("Tickets controller", () => {
   });
 
   describe("Find tickets", () => {
-    it.skip("should return 404 if ticket is not found", async () => {
+    it("should return 404 if ticket is not found", async () => {
       const response = await request(app)
         .get(`/api/tickets/admin/${ticketId}`)
         .set("Cookie", cookie)
@@ -123,8 +123,7 @@ describe("Tickets controller", () => {
           price,
         });
 
-      expect(response.status).toEqual(200);
-      expect(response.body.length).toEqual(1);
+      expect(response.status).toEqual(404);
     });
 
     it("should return a 401 if user is not signed in", async () => {
@@ -152,39 +151,24 @@ describe("Tickets controller", () => {
         .expect(401);
     });
 
-    it.skip("should publish an event", async () => {
+    it("should reject updates if the ticket is reserved", async () => {
       // create a ticket
-      const response = await createTicketHelper(title, price, cookie);
+      let response = await createTicketHelper(title, price, cookie);
 
-      await request(app)
+      const ticket = await Ticket.findById(response.body.id);
+
+      ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
+      await ticket!.save();
+
+      response = await request(app)
         .put(`/api/tickets/admin/${response.body.id}`)
         .set("Cookie", cookie)
         .send({
           title: "new title",
           price: 100,
-        })
-        .expect(201);
+        });
 
-      expect(NatsWrapper.getClient().publish).toHaveBeenCalled();
+      expect(response.status).toEqual(400);
     });
-    // it("should reject updates if the ticket is reserved", async () => {
-    //   // create a ticket
-    //   let response = await createTicketHelper(title, price, cookie);
-
-    //   const ticket = await Ticket.findById(response.body.id);
-
-    //   ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
-    //   await ticket!.save();
-
-    //   response = await request(app)
-    //     .put(`/api/tickets/admin${response.body.id}`)
-    //     .set("Cookie", cookie)
-    //     .send({
-    //       title: "new title",
-    //       price: 100,
-    //     });
-
-    //   expect(response.status).toEqual(400);
-    // });
   });
 });

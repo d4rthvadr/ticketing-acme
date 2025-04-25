@@ -16,13 +16,18 @@ router.get("/", currentUser, requireAuth, async (_req: Request, res: Response) =
 });
 
 // /admin/api/tickets/:id
-router.get("/:id", currentUser, requireAuth, async (req: Request, res: Response) => {
-  const ticketId: string = req.params.id;
+router.get(
+  "/:id",
+  currentUser,
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const ticketId: string = req.params.id;
 
-  const ticket: TicketDocument | null = await adminTicketService.findById(ticketId);
+    const ticket: TicketDocument | null = await adminTicketService.findById(ticketId);
 
-  return res.status(200).send(ticket);
-});
+    return res.status(200).send(ticket);
+  }),
+);
 
 // /api/tickets/admin
 router.post(
@@ -57,7 +62,7 @@ router.put(
     body("title").trim().notEmpty().withMessage("Title is required"),
   ],
   validateRequest,
-  async (req: Request, res: Response) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { title, price } = req.body;
 
     const ticket: TicketDocument = await adminTicketService.update({
@@ -68,7 +73,7 @@ router.put(
     });
 
     return res.status(201).send(ticket);
-  },
+  }),
 );
 
 export default router;

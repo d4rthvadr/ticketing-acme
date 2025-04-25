@@ -59,9 +59,8 @@ router.patch(
   requireAuth,
   asyncHandler(async (req: Request, res: Response) => {
     const orderId: string = req.params.id;
-
-    await orderService.cancel(orderId, req.user.id);
-    return res.status(204);
+    const order = await orderService.cancel(orderId, req.user.id);
+    return res.status(204).send(order);
   }),
 );
 
