@@ -27,7 +27,11 @@ jest.mock("../libs/stripe");
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create({});
+  mongoServer = await MongoMemoryServer.create({
+    binary: {
+      version: "4.4.10", // Use MongoDB 4.4 to avoid AVX issues
+    },
+  });
   const mongoUri = mongoServer.getUri();
   await mongoose
     .connect(mongoUri, {})
@@ -41,11 +45,13 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  jest.clearAllMocks();
+  // jest.clearAllMocks();
 
-  const collections = await mongoose.connection.db!.collections();
+  const collections = mongoose.connection.db
+    ? await mongoose.connection.db.collections()
+    : [];
 
-  collections?.map(async (collection) => await collection.deleteMany({}));
+  collections.map(async (collection) => await collection.deleteMany({}));
 });
 
 afterAll(async () => {

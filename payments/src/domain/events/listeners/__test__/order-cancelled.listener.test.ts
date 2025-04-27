@@ -22,9 +22,11 @@ const setup = async (): Promise<{
     version: 0,
   };
 
-  await orderService.cancelOrder({
+  await orderService.create({
     id: orderCancelled.id,
     userId: orderCancelled.userId,
+    status: OrderStatus.Created,
+    price: 20,
     version: orderCancelled.version,
   });
 

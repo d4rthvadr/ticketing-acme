@@ -18,6 +18,7 @@ import { Payment, PaymentDocument } from "../../domain/models/payment.model";
 import { PaymentProvider } from "../../domain/enums/payment-providers.enum";
 import { PaymentCreatedPublisher } from "../../domain/events/publishers/payment-created.publisher";
 import NatsWrapper from "../../libs/nats-wrapper";
+import Stripe from "stripe";
 
 export class OrderService {
   private orderModel: OrderModel;
@@ -121,7 +122,7 @@ export class OrderService {
         throw new BadRequestError("Order already completed.");
       }
 
-      const stripeResult = await stripe.charges.create({
+      const stripeResult: Stripe.Charge = await stripe.charges.create({
         amount: convertToCents(order.price),
         currency: Currencies.USD,
         source: token,
@@ -144,8 +145,6 @@ export class OrderService {
           paymentProvider: payment.paymentProvider,
         },
       });
-
-      console.log("Stripe charge result", stripeResult);
 
       return payment;
     } catch (err) {

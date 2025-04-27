@@ -4,12 +4,15 @@ import mongoose from "mongoose";
 import { Order, OrderDocument } from "../../domain/models/order.model";
 import { OrderStatus } from "@vtex-tickets/common";
 import { stripe } from "../../libs/stripe";
+import Stripe from "stripe";
 
-const createAndSaveOrder = async (): Promise<OrderDocument> => {
+const createAndSaveOrder = async (
+  status = OrderStatus.Created
+): Promise<OrderDocument> => {
   const order = Order.build({
     orderId: new mongoose.Types.ObjectId().toHexString(),
     userId: new mongoose.Types.ObjectId().toHexString(),
-    status: OrderStatus.Created,
+    status,
     version: 0,
     price: 10,
   });
@@ -39,7 +42,10 @@ it("should return 401 if order does not belong to user", async () => {
 });
 
 it("should return 400 for already cancelled order", async () => {
-  const order = await createAndSaveOrder();
+  const order = await createAndSaveOrder(OrderStatus.Cancelled);
+
+  const chargeSpy = jest.spyOn(stripe.charges, "create");
+  chargeSpy.mockResolvedValue({ id: "123" } as any);
 
   await request(app)
     .post(`/api/payments/${order.id}/charge`)
@@ -52,6 +58,9 @@ it("should return 400 for already cancelled order", async () => {
 
 it("should return 201 with valid inputs", async () => {
   const order = await createAndSaveOrder();
+
+  const chargeSpy = jest.spyOn(stripe.charges, "create");
+  chargeSpy.mockResolvedValue({ id: "123" } as any);
 
   await request(app)
     .post(`/api/payments/${order.id}/charge`)
