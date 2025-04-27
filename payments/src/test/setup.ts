@@ -29,7 +29,7 @@ let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create({
     binary: {
-      version: "4.4.10", // Use MongoDB 4.4 to avoid AVX issues
+      version: "6.0.6",
     },
   });
   const mongoUri = mongoServer.getUri();
@@ -45,7 +45,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  // jest.clearAllMocks();
+  jest.clearAllMocks();
 
   const collections = mongoose.connection.db
     ? await mongoose.connection.db.collections()
