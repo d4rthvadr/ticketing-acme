@@ -1,9 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import crypto from 'crypto';
 import request from 'supertest';
 import { app } from '../app';
-import { signJwtToken } from '@vtex-tickets/common';
 
 let mongoServer: MongoMemoryServer;
 
