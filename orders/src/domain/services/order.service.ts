@@ -174,7 +174,7 @@ export class OrderService {
           id: order.id,
           userId: order.userId,
           ticket: {
-            id: order.ticket.ticketId as string,
+            id: order.ticket._id,
           },
           version: order.version,
         },

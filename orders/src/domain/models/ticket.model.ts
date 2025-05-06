@@ -7,6 +7,7 @@ export interface TicketAttributes {
 }
 
 export interface TicketDocument extends mongoose.Document, TicketAttributes {
+  _id: string;
   version: number;
   createdAt: Date;
 }

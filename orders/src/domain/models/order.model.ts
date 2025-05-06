@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { OrderStatus } from "@vtex-tickets/common";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { TicketAttributes } from "./ticket.model";
+import { TicketDocument } from "./ticket.model";
 
 interface OrderAttributes {
-  ticket: TicketAttributes;
+  ticket: TicketDocument;
   expiresAt: Date;
   status: OrderStatus;
   userId: string;
