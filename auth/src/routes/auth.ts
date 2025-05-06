@@ -37,7 +37,7 @@ router.post(
 
     const user: UserDocument = User.build({
       email,
-      password,
+      password: await Password.toHash(password),
     });
 
     await user.save();
@@ -82,16 +82,16 @@ router.post(
         .send({ message: 'Account not found or invalid credentials' });
     }
 
-    // TODO: fix hashing issue with password
+    const passwordMatch = await Password.compare(
+      existingUser.password,
+      password,
+    );
 
-    // const passwordMatch = await Password.compare(
-    //   password,
-    //   existingUser.password,
-    // );
-
-    // if (!passwordMatch) {
-    //   return res.status(400).send({errors: ['Account not found or invalid credentials']});
-    // }
+    if (!passwordMatch) {
+      return res
+        .status(400)
+        .send({ errors: ['Account not found or invalid credentials'] });
+    }
 
     req.session = {
       ...req.session,
