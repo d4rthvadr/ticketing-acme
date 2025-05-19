@@ -13,19 +13,19 @@ spec:
         app: client
     spec:
       containers:
-      - name: client
-        image: mistykraken/client
-        resources:
-          requests:
-            cpu: "20m"
-            memory: "55M"
-        ports:
-        - containerPort: 3000
-          name: client-port
-        imagePullPolicy: Never
-        env:
-        - name: REACT_APP_API_URL
-          value: http://localhost:3001
+        - name: client
+          image: d4rthvadr/t-acme-client
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "55M"
+          ports:
+            - containerPort: 3000
+              name: client-port
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REACT_APP_API_URL
+              value: http://localhost:3001
       restartPolicy: Always
 
 ---
@@ -37,6 +37,6 @@ spec:
   selector:
     app: client
   ports:
-  - name: client-fe
-    port: 3000
-    targetPort: 3000
+    - name: client-fe
+      port: 3000
+      targetPort: 3000

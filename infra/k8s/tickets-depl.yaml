@@ -13,7 +13,7 @@ spec:
         app: tickets
     spec:
       containers:
-        - image: mistykraken/tickets
+        - image: d4rthvadr/t-acme-tickets
           name: tickets
           resources:
             requests:
@@ -34,7 +34,7 @@ spec:
           ports:
             - containerPort: 3002
               name: tickets-port
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           env:
             - name: DB_MONGO_URL
               value: mongodb://tickets-mongo-srv:27017/tickets

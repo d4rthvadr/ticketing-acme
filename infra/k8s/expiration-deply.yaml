@@ -13,13 +13,13 @@ spec:
         app: expiration
     spec:
       containers:
-        - image: mistykraken/expiration
+        - image: d4rthvadr/t-acme-expiration
           name: expiration
           resources:
             requests:
               cpu: "20m"
               memory: "55M"
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           env:
             - name: NODE_ENV
               value: "dev"

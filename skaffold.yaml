@@ -8,7 +8,7 @@ build:
   local:
     push: false
   artifacts:
-    - image: mistykraken/auth
+    - image: d4rthvadr/t-acme-auth
       context: auth
       docker:
         dockerfile: Dockerfile.dev
@@ -16,7 +16,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: mistykraken/tickets
+    - image: d4rthvadr/t-acme-tickets
       context: tickets
       docker:
         dockerfile: Dockerfile.dev
@@ -24,7 +24,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: mistykraken/orders
+    - image: d4rthvadr/t-acme-orders
       context: orders
       docker:
         dockerfile: Dockerfile.dev
@@ -32,7 +32,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: mistykraken/payments
+    - image: d4rthvadr/t-acme-payments
       context: payments
       docker:
         dockerfile: Dockerfile.dev
@@ -40,7 +40,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: mistykraken/expiration
+    - image: d4rthvadr/t-acme-expiration
       context: expiration
       docker:
         dockerfile: Dockerfile.dev
@@ -48,7 +48,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: mistykraken/client
+    - image: d4rthvadr/t-acme-client
       context: client
       docker:
         dockerfile: Dockerfile

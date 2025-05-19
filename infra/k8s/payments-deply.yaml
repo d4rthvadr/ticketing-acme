@@ -13,7 +13,7 @@ spec:
         app: payments
     spec:
       containers:
-        - image: mistykraken/payments
+        - image: d4rthvadr/t-acme-payments
           name: payments
           resources:
             requests:
@@ -34,7 +34,7 @@ spec:
           ports:
             - containerPort: 3004
               name: payments-port
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           env:
             - name: DB_MONGO_URL
               value: mongodb://payments-mongo-srv:27017/payments
