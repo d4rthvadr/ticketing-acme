@@ -7,6 +7,10 @@ import useRequest from "../../hooks/use-request";
 import ErrorAlert from "../../components/shared/error-alert";
 import Router from "next/router";
 
+const ErrorMessage = {
+  [OrderStatus.Cancelled]: "Order has been cancelled",
+  [OrderStatus.Complete]: "Order has been completed",
+};
 const OrderItem = ({ order }) => {
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -15,7 +19,7 @@ const OrderItem = ({ order }) => {
   }
 
   const { ticket, status } = order;
-  const isOrderCompleted = order.status === OrderStatus.Complete;
+  const isOrderValid = order.status === OrderStatus.Created;
 
   useEffect(() => {
     const findTimeLeft = () => {
@@ -43,10 +47,12 @@ const OrderItem = ({ order }) => {
     onSuccess: (_) => Router.push("/orders"),
   });
 
-  if (timeLeft <= 0 || order.status === OrderStatus.Cancelled) {
+  const errorMessage = ErrorMessage[order.status] ?? "Order not found";
+
+  if (!isOrderValid || timeLeft <= 0) {
     return (
       <EmptyState
-        message={"Order has expired"}
+        message={errorMessage}
         onRedirect={() => Router.push("/orders")}
       />
     );
@@ -64,9 +70,9 @@ const OrderItem = ({ order }) => {
         <h4>Price: {ticket.price}</h4>
         <h4>Status: {status}</h4>
 
-        {!isOrderCompleted && (
+        {isOrderValid && (
           <>
-            <h4>Expires at: {timeLeft} seconds</h4>
+            <h4>Expires in: {timeLeft} seconds</h4>
 
             <StripeCheckout
               token={({ id }) => {

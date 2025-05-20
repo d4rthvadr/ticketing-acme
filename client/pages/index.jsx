@@ -1,11 +1,9 @@
 import EmptyState from "../components/shared/empty-state";
-import { WarningAlert } from "../components/ui/alert.component";
 import TableComponent from "../components/ui/table.component";
 
 const LandingPage = ({ tickets }) => {
   return (
     <>
-      <WarningAlert message={"Grab your free promo"} show={true} />
       <TableComponent
         data={tickets}
         dataHeaders={["ID", "Title", "Price", "Created On", "Actions"]}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Router from "next/router";
 import useRequest from "../../hooks/use-request";
-import ErrorAlert from "../../components/error-alert";
+// import ErrorAlert from "../../components/shared/error-alert";
 
 export default () => {
   const [email, setEmail] = useState("");
@@ -32,7 +32,7 @@ export default () => {
         <form onSubmit={onSubmit}>
           <h1>Sign Up</h1>
 
-          <ErrorAlert errors={errors} />
+          {/* <ErrorAlert errors={errors} /> */}
 
           <div className="form-group">
             <label>Email Address</label>
