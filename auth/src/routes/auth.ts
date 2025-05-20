@@ -20,7 +20,7 @@ router.post(
     body('password')
       .trim()
       .notEmpty()
-      .isLength({ min: 6, max: 20 })
+      .isLength({ min: 5, max: 20 })
       .withMessage('Password is required'),
   ],
   validateRequest,

@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./auth # Point to the auth directory
           file: ./auth/Dockerfile # Path to the Dockerfile relative to repo root
