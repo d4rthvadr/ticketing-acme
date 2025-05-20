@@ -1,0 +1,28 @@
+name: deploy-manifests
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "infra/k8**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: main
+    defaults:
+      run:
+        working-directory: auth
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to digitalocean
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITAL_OCEAN_ACCESS_TOKEN }}
+
+      - name: Fetch kubeconfig for the cluster
+        run: doctl k8s cluster kubeconfig save "${{ vars.CLUSTER_ENV_NAME}}"
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f infra/k8s/
