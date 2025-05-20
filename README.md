@@ -104,6 +104,20 @@ kubectl port-forward nats-depl-XXXXX-XXXX 4222:4222
 
 ```
 
+4. Build individual services
+   Change svc-name in `/d4rthvadr/t-acme-{svc-name}` with one of these. IE auth, tickets, payments etc.
+
+```shell
+docker build -t d4rthvadr/t-acme-{svc-name} -f Dockerfile .
+
+```
+
+5. Add digital ocean kubernetes cluster
+
+```shell
+doctl kubernetes cluster kubeconfig save ticket-acme-k8s
+```
+
 ### Notes
 
 Nats
