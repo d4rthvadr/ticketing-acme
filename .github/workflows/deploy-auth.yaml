@@ -1,20 +1,22 @@
 name: deploy-auth
 on:
-  push:
+  workflow_run:
+    workflows: ["auth-tests"]
+    types:
+      - completed
     branches:
       - main
-    paths:
-      - "auth/**"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: auth
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -29,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v2
         with:
           context: ./auth # Point to the auth directory
           file: ./auth/Dockerfile # Path to the Dockerfile relative to repo root
@@ -37,3 +39,5 @@ jobs:
           tags: |
             d4rthvadr/t-acme-auth
             d4rthvadr/t-acme-auth:${{ github.sha }}
+          cache-from: type=registry,ref=d4rthvadr/t-acme-auth:buildcache
+          cache-to: type=registry,ref=d4rthvadr/t-acme-auth:buildcache,mode=max
