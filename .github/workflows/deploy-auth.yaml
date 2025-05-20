@@ -1,11 +1,9 @@
 name: deploy-auth
 on:
-  workflow_run:
-    workflows: ["auth-tests"]
-    types:
-      - completed
-    branches:
-      - main
+  push:
+    branches: ["main"]
+    paths:
+      - "auth/**"
 
   workflow_dispatch:
 
