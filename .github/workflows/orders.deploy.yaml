@@ -40,8 +40,8 @@ jobs:
           tags: |
             d4rthvadr/t-acme-orders
             d4rthvadr/t-acme-orders:${{ github.sha }}
-          cache-from: type=registry,ref=d4rthvadr/t-acme-orders:buildcache
-          cache-to: type=registry,ref=d4rthvadr/t-acme-orders:buildcache,mode=max
+          # cache-from: type=registry,ref=d4rthvadr/t-acme-orders:buildcache
+          # cache-to: type=registry,ref=d4rthvadr/t-acme-orders:buildcache,mode=max
 
       - name: Deploy to digitalocean
         uses: digitalocean/action-doctl@v2

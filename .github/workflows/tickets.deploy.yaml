@@ -36,12 +36,12 @@ jobs:
           context: ./tickets # Point to the tickets directory
           file: ./tickets/Dockerfile # Path to the Dockerfile relative to repo root
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: |
             d4rthvadr/t-acme-tickets
             d4rthvadr/t-acme-tickets:${{ github.sha }}
-          cache-from: type=registry,ref=d4rthvadr/t-acme-tickets:buildcache
-          cache-to: type=registry,ref=d4rthvadr/t-acme-tickets:buildcache,mode=max
+        #   cache-from: type=registry,ref=d4rthvadr/t-acme-tickets:buildcache
+        #   cache-to: type=registry,ref=d4rthvadr/t-acme-tickets:buildcache,mode=max
 
       - name: Deploy to digitalocean
         uses: digitalocean/action-doctl@v2
