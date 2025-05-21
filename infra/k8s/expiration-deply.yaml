@@ -19,7 +19,7 @@ spec:
             requests:
               cpu: "20m"
               memory: "55M"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: NODE_ENV
               value: "dev"

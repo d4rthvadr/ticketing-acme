@@ -34,7 +34,7 @@ spec:
           ports:
             - containerPort: 3001
               name: auth-port
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: DB_MONGO_URL
               value: mongodb://auth-mongo-srv:27017/auth

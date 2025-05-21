@@ -34,7 +34,7 @@ spec:
           ports:
             - containerPort: 3002
               name: tickets-port
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: DB_MONGO_URL
               value: mongodb://tickets-mongo-srv:27017/tickets
