@@ -36,6 +36,7 @@ jobs:
           context: ./orders # Point to the orders directory
           file: ./orders/Dockerfile # Path to the Dockerfile relative to repo root
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             d4rthvadr/t-acme-orders
             d4rthvadr/t-acme-orders:${{ github.sha }}

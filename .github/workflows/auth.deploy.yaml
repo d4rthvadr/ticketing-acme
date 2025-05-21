@@ -36,6 +36,7 @@ jobs:
           context: ./auth # Point to the auth directory
           file: ./auth/Dockerfile # Path to the Dockerfile relative to repo root
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             d4rthvadr/t-acme-auth
             d4rthvadr/t-acme-auth:${{ github.sha }}

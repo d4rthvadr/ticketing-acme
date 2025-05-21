@@ -36,6 +36,7 @@ jobs:
           context: ./expiration # Point to the expiration directory
           file: ./expiration/Dockerfile # Path to the Dockerfile relative to repo root
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             d4rthvadr/t-acme-expiration
             d4rthvadr/t-acme-expiration:${{ github.sha }}
