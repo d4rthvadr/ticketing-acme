@@ -24,17 +24,20 @@ jobs:
       - name: Fetch kubeconfig for the cluster
         run: doctl k8s cluster kubeconfig save "${{ vars.CLUSTER_ENV_NAME}}"
 
-      - name: Create JWT secret
+      - name: Create application secrets
         run: |
+
           kubectl create secret generic jwt-secret \
               --from-literal=JWT_KEY=${{ secrets.JWT_KEY }} \
-              --dry-run=client -o yaml | kubectl apply -f -
+              --dry-run=client -o yaml | kubectl apply -f - 
 
-      - name: Create Stripe secret
-        run: |
           kubectl create secret generic stripe-secret \
               --from-literal=STRIPE_KEY=${{ secrets.STRIPE_KEY }} \
               --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Setup nginx ingress controller
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
       - name: Apply Kubernetes manifests
         run: kubectl apply -f infra/k8s/ -f infra/k8s-prod/
