@@ -1,4 +1,4 @@
-name: deploy-auth
+name: auth-deploy
 on:
   push:
     branches: ["main"]
