@@ -7,6 +7,10 @@
 - <!-- e.g., Added validation logic for user signup -->
 - <!-- e.g., Refactored payment service to use async/await -->
 
+### Acceptance Criteria
+
+<!-- A list of acceptance criteria that it meets based on your ticket-->
+
 ### References
 
 [Example](www.google.com)
