@@ -12,7 +12,7 @@ app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: process.env.NODE_ENV === "dev" ? false : true,
+    secure: false, // disabled because we are not using https at the moment
   })
 );
 
