@@ -82,7 +82,7 @@ const onStart = async () => {
   try {
     await connectDB(DB_MONGO_URL);
     server = app.listen(PORT, () => {
-      console.log(`Listening on ${PORT}`);
+      console.log(`Listening on ${PORT} ...`);
     });
 
     server!.setTimeout(SERVER_TIME_OUT);
