@@ -50,11 +50,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            # - name: JWT_SECRET
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: jwt-secret
-            #       key: JWT_KEY
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
 
       restartPolicy: Always
 
