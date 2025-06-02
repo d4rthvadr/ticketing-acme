@@ -5,7 +5,6 @@ import { randomBytes } from "crypto";
 import { initializeEventListeners } from "./domain/events/init-listeners";
 
 const PORT = process.env.NODE_PORT;
-process.env.JWT_SECRET = "SOME_SECRET"; // TODO: pick from env instead
 let server: Server | undefined;
 
 /**

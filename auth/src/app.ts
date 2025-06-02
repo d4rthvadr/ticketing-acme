@@ -6,8 +6,6 @@ import { errorHandler, NotFoundError } from '@vtex-tickets/common';
 
 dotenv.config();
 
-console.log('Environment variables: ', { mode: process.env.NODE_ENV });
-
 const app = express();
 app.set('trust proxy', true);
 app.use(json());
