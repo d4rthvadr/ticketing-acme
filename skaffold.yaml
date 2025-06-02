@@ -52,7 +52,7 @@ build:
     - image: d4rthvadr/t-acme-client
       context: client
       docker:
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.dev
       sync:
         manual:
           - src: "**/*.js"
