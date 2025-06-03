@@ -1,0 +1,129 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Deployment
+      name: tickets-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: tickets-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: tickets
+                image: d4rthvadr/t-acme-tickets
+                imagePullPolicy: IfNotPresent
+  - target:
+      kind: Deployment
+      name: orders-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: orders-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: orders
+                image: d4rthvadr/t-acme-orders
+                imagePullPolicy: IfNotPresent
+  - target:
+      kind: Deployment
+      name: auth-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: auth-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: auth
+                image: d4rthvadr/t-acme-auth
+                imagePullPolicy: IfNotPresent
+
+  - target:
+      kind: Deployment
+      name: payments-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: payments-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: payments
+                image: d4rthvadr/t-acme-payments
+                imagePullPolicy: IfNotPresent
+
+  - target:
+      kind: Deployment
+      name: expiration-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: expiration-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: expiration
+                image: d4rthvadr/t-acme-expiration
+                imagePullPolicy: IfNotPresent
+
+  - target:
+      kind: Deployment
+      name: client-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: client-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: client
+                image: d4rthvadr/t-acme-client
+                imagePullPolicy: IfNotPresent
+
+  - target:
+      kind: Deployment
+      name: client-deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: client-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - name: client
+                image: d4rthvadr/t-acme-client
+                imagePullPolicy: IfNotPresent
+
+replicas:
+  - name: tickets-deployment
+    count: 2
+  - name: orders-deployment
+    count: 1
+  - name: auth-deployment
+    count: 1
+  - name: payments-deployment
+    count: 1
+  - name: expiration-deployment
+    count: 1
+  - name: client-deployment
+    count: 1

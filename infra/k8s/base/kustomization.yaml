@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - tickets-deply.yaml
+  - auth-deply.yaml
+  - payments-deply.yaml
+  - orders-deply.yaml
+  - expiration-deply.yaml
+  - client-deply.yaml
+  - tickets-mongo-deply.yaml
+  - auth-mongo-deply.yaml
+  - orders-mongo-deply.yaml
+  - expiration-redis-deply.yaml
+  - payments-mongo-deply.yaml
+  - nats-deply.yaml
