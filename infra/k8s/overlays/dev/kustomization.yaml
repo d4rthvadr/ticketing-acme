@@ -117,13 +117,3 @@ patches:
 replicas:
   - name: tickets-deployment
     count: 2
-  - name: orders-deployment
-    count: 1
-  - name: auth-deployment
-    count: 1
-  - name: payments-deployment
-    count: 1
-  - name: expiration-deployment
-    count: 1
-  - name: client-deployment
-    count: 1
