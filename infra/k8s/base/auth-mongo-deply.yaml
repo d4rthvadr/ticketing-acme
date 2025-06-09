@@ -13,7 +13,7 @@ spec:
         app: auth-mongo
     spec:
       containers:
-        - image: mongo
+        - image: mongo:4.4
           name: auth-mongo
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
