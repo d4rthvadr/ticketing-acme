@@ -1,0 +1,49 @@
+[core]
+compression = 9
+whitespace = error
+preloadIndex = true
+
+[advice]
+addEmptyPathspec = false
+
+[init]
+defaultBranch = main
+
+[status]
+branch = true
+showStash = true
+showUntrackedFiles = all
+
+[diff]
+context = 3
+renames = copies
+interHunkContext = 10
+
+[pager]
+diff = diff-so-fancy | $pager
+
+[diff-so-fancy]
+markEmptyLines = false
+
+[color "diff"]
+meta = black bold
+frag = magenta
+context = white
+whitespace = yellow reverse
+old = red
+
+[push]
+autoSetupRemote = true
+defaultBranch = current
+followTags = true
+
+[push]
+default = current
+rebase = true
+
+[rebase]
+autostash = true
+missingCommitsCheck = warn
+
+[log]
+abbrevCommit = true
