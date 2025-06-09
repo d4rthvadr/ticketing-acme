@@ -172,6 +172,14 @@ This CI/CD process ensures that changes are deployed quickly and reliably, reduc
 - Retry + circuit breaker pattern
 - Bulk-head pattern
 
+## Screenshots
+
+Below is a screenshot showcasing the application:
+
+![Application Screenshot](./screenshots/sc001.png)
+![Application Screenshot](./screenshots/sc002.png)
+![Application Screenshot](./screenshots/sc003.png)
+
 ## Acknowledgements
 
 This project was made possible thanks to the following tools, libraries, and contributors:
