@@ -37,9 +37,11 @@ jobs:
               --from-literal=STRIPE_KEY=${{ secrets.STRIPE_KEY }} \
               --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Setup nginx ingress controller
-        run: |
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+      # - name: Setup nginx ingress controller
+      #   run: |
+      #     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
       - name: Apply Kubernetes manifests
-        run: kubectl apply -f ./k8s/ -f ./k8s-prod/
+        run: |
+          kubectl apply -f ./k8s-prod/
+          kubectl apply -k ./k8s/overlays/prod/
