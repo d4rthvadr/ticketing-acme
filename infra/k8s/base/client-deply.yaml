@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: d4rthvadr/t-acme-client
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "55M"
+            limits:
+              cpu: "100m"
+              memory: "128M"
+          ports:
+            - containerPort: 3000
+              name: client-port
+          imagePullPolicy: Always
+          env:
+            - name: REACT_APP_API_URL
+              value: http://localhost:3001
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: client-srv
+spec:
+  selector:
+    app: client
+  ports:
+    - name: client-fe
+      port: 3000
+      targetPort: 3000
