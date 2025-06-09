@@ -13,7 +13,7 @@ spec:
         app: expiration-redis
     spec:
       containers:
-        - image: redis
+        - image: redis:6.2
           name: expiration-redis
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
